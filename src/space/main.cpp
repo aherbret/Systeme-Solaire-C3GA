@@ -15,6 +15,7 @@
 #include <../include/glimac/FreeflyCamera.hpp>
 #include <../include/space/Texture.hpp>
 #include <../include/space/SkyBox.hpp>
+#include <../include/space/Transformation.hpp>
 
 #include <c3ga/Mvec.hpp>
 
@@ -73,6 +74,13 @@ int main(int argc, char** argv) {
     Skytext skytex(applicationPath);
 
     Sphere sphere(1, 32, 16); // rayon = 1, latitude = 32, longitude = 16
+
+    Sphere sphere2(1, 32, 16); // rayon = 1, latitude = 32, longitude = 16
+
+    Transformation t;
+
+    t.scale(sphere2.getSphere());
+
     //Sphere sphere(point(1.0,2.0,0.0), 32, 16); // rayon = 1, latitude = 32, longitude = 16
     //sphere.buildC3GA();
     
@@ -248,6 +256,17 @@ int main(int argc, char** argv) {
         glDrawArrays(GL_TRIANGLES, 0, sphere.getVertexCount());
         glActiveTexture(GL_TEXTURE0);
         tex.activeAndBindTexture(GL_TEXTURE0, 0); // la texture earthTexture est bindée sur l'unité GL_TEXTURE0
+        glUniform1i(sunProgram.uTexture, 0);
+
+        // Specify the value of a uniform variable for the current program object
+        glUniformMatrix4fv(sunProgram.uMVMatrix, 1, GL_FALSE, glm::value_ptr(sunMVMatrix));
+        glUniformMatrix4fv(sunProgram.uNormalMatrix, 1, GL_FALSE, glm::value_ptr(glm::transpose(glm::inverse(sunMVMatrix))));
+        glUniformMatrix4fv(sunProgram.uMVPMatrix, 1, GL_FALSE, glm::value_ptr(ProjMatrix * sunMVMatrix));
+        tex.activeAndBindTexture(GL_TEXTURE0, texture[1]);
+        glDrawArrays(GL_TRIANGLES, 0, sphere2.getVertexCount());
+        glActiveTexture(GL_TEXTURE0);
+        tex.activeAndBindTexture(GL_TEXTURE0, 0); // la texture earthTexture est bindée sur l'unité GL_TEXTURE0
+        tex.activeAndBindTexture(GL_TEXTURE1, 0); // la texture cloudTexture est bindée sur l'unité GL_TEXTURE1
         glUniform1i(sunProgram.uTexture, 0);
 
         // Soleil (grande) avec C3GA
