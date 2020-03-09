@@ -25,12 +25,6 @@ namespace glimac {
         c3ga::Mvec<double> ds = s.dual();
 
         float rs = sqrt(ds * ds) / std::abs(ds[c3ga::E0]) * 2;
-        /*
-        /////
-        radiusVector = c3ga::point<double>(0, 0, 0);
-        std::cout << "Point C3GA initial : " << radiusVector << std::endl;
-        ////
-        */
 
         GLfloat rcpLat = 1.f / discLat, rcpLong = 1.f / discLong;
         GLfloat dPhi = 2 * glm::pi<float>() * rcpLat, dTheta = glm::pi<float>() * rcpLong;
@@ -142,6 +136,10 @@ namespace glimac {
 
     c3ga::Mvec<double> Sphere::getSphere() {
         return s;
+    }
+
+    void Sphere::setSphere(c3ga::Mvec<double> sph) {
+        s = sph;
     }
 
     std::list<c3ga::Mvec<double>> Sphere::getCoordsphere() {

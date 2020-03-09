@@ -34,6 +34,7 @@ namespace glimac {
 
             c3ga::Mvec<double> sphere(float Rsphere);
             c3ga::Mvec<double> getSphere();
+            void setSphere(c3ga::Mvec<double> sph);
             std::list<c3ga::Mvec<double>> getCoordsphere();
 
         private:
