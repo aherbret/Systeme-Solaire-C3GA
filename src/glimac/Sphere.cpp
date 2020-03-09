@@ -13,13 +13,18 @@ namespace glimac {
     // Constructeur: alloue le tableau de données et construit les attributs des vertex
     Sphere::Sphere(GLfloat radius, GLsizei discLat, GLsizei discLong):
         vertexCount(0) {
-        //build(radius, discLat, discLong); // Construction (voir le .cpp)
-        buildC3GA();
+        build(radius, discLat, discLong); // Construction (voir le .cpp)
+        //buildC3GA();
     }
 
     Sphere::~Sphere(){}
 
     void Sphere::build(GLfloat r, GLsizei discLat, GLsizei discLong) {
+        /////
+        radiusVector = c3ga::point<double>(0, 0, 0);
+        std::cout << "Point C3GA initial : " << radiusVector << std::endl;
+        ////
+
         GLfloat rcpLat = 1.f / discLat, rcpLong = 1.f / discLong;
         GLfloat dPhi = 2 * glm::pi<float>() * rcpLat, dTheta = glm::pi<float>() * rcpLong;
         
