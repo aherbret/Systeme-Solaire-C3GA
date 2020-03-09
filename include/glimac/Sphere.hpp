@@ -33,6 +33,8 @@ namespace glimac {
             GLsizei getVertexCount() const;
 
             c3ga::Mvec<double> sphere(float Rsphere);
+            c3ga::Mvec<double> getSphere();
+            std::list<c3ga::Mvec<double>> getCoordsphere();
 
         private:
         	c3ga::Mvec<double> s;

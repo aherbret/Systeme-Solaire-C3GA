@@ -140,4 +140,11 @@ namespace glimac {
         return vertexCount;
     }
 
+    c3ga::Mvec<double> Sphere::getSphere() {
+        return s;
+    }
+
+    std::list<c3ga::Mvec<double>> Sphere::getCoordsphere() {
+        return coordsphere;
+    }
 }
