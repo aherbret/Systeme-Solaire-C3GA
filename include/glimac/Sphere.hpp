@@ -32,7 +32,11 @@ namespace glimac {
             // Renvoit le nombre de vertex
             GLsizei getVertexCount() const;
 
+            c3ga::Mvec<double> sphere(float Rsphere);
+
         private:
+        	c3ga::Mvec<double> s;
+        	std::list<c3ga::Mvec<double>> coordsphere;
             std::vector<ShapeVertex> vertices;
             c3ga::Mvec<GLfloat> radiusVector;
             GLsizei vertexCount; // Nombre de sommets
