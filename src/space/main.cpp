@@ -269,6 +269,17 @@ int main(int argc, char** argv) {
         tex.activeAndBindTexture(GL_TEXTURE1, 0); // la texture cloudTexture est bindée sur l'unité GL_TEXTURE1
         glUniform1i(sunProgram.uTexture, 0);
 
+        // Specify the value of a uniform variable for the current program object
+        glUniformMatrix4fv(sunProgram.uMVMatrix, 1, GL_FALSE, glm::value_ptr(sunMVMatrix));
+        glUniformMatrix4fv(sunProgram.uNormalMatrix, 1, GL_FALSE, glm::value_ptr(glm::transpose(glm::inverse(sunMVMatrix))));
+        glUniformMatrix4fv(sunProgram.uMVPMatrix, 1, GL_FALSE, glm::value_ptr(ProjMatrix * sunMVMatrix));
+        tex.activeAndBindTexture(GL_TEXTURE0, texture[1]);
+        glDrawArrays(GL_TRIANGLES, 0, sphere2.getVertexCount());
+        glActiveTexture(GL_TEXTURE0);
+        tex.activeAndBindTexture(GL_TEXTURE0, 0); // la texture earthTexture est bindée sur l'unité GL_TEXTURE0
+        tex.activeAndBindTexture(GL_TEXTURE1, 0); // la texture cloudTexture est bindée sur l'unité GL_TEXTURE1
+        glUniform1i(sunProgram.uTexture, 0);
+
         // Soleil (grande) avec C3GA
         moonProgram.m_Program.use();
         glUniform1i(moonProgram.uTexture, 0);
