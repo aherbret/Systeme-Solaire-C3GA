@@ -8,7 +8,6 @@
 #include <glimac/glm.hpp>
 #include <glimac/Image.hpp>
 #include <glimac/Sphere.hpp>
-#include <glimac/SphereBiri.hpp>
 #include <glimac/Geometry.hpp>
 #include <cstddef>
 #include <vector>
@@ -69,9 +68,9 @@ int main(int argc, char** argv) {
     Program program = loadProgram(applicationPath.dirPath() + "../shaders/3D.vs.glsl",
                                   applicationPath.dirPath() + "../shaders/tex3D.fs.glsl");
 
-    SphereBiri sphere(1, 32, 16); // rayon = 1, latitude = 32, longitude = 16
+    Sphere sphere(1, 32, 16); // rayon = 1, latitude = 32, longitude = 16
     //Sphere sphere(point(1.0,2.0,0.0), 32, 16); // rayon = 1, latitude = 32, longitude = 16
-    //sphere.build();
+    //sphere.buildC3GA();
     Texture tex;
     std::cout << sphere.getVertexCount() << std::endl;
 

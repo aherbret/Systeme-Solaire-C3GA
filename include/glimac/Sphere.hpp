@@ -15,12 +15,16 @@ namespace glimac {
         public:
             // Constructeur
             Sphere(const c3ga::Mvec<GLfloat> &radiusVector, GLuint64 longitude, GLuint64 latitude);
+            Sphere(GLfloat radius, GLsizei discLat, GLsizei discLong);
 
             // Destructeur
             ~Sphere();
 
             // Alloue et construit les données (implantation dans le .cpp)
-            void build();
+            void build(GLfloat radius, GLsizei discLat, GLsizei discLong);
+
+            // Alloue et construit les données (implantation dans le .cpp)
+            void buildC3GA();
 
             // Renvoit le pointeur vers les données
             const ShapeVertex* getDataPointer() const;
