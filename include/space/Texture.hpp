@@ -48,6 +48,17 @@ struct TexProgram {
     }
 };
 
+struct Skytext {
+    glimac::Program m_Program;
+    GLint uCubemap;
+    GLint uMVP;
+    Skytext(const glimac::FilePath& applicationPath): m_Program(loadProgram(applicationPath.dirPath() + "../shaders/skybox.vs.glsl",
+                                                                            applicationPath.dirPath() + "../shaders/skybox.fs.glsl")) {
+        uCubemap = glGetUniformLocation(m_Program.getGLId(), "uCubemap");
+        uMVP = glGetUniformLocation(m_Program.getGLId(), "uMVP");
+    }
+};
+    
 class Texture {
 	public :
 		void firstBindTexture(std::unique_ptr<Image> &texLoad, GLuint texture);
