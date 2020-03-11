@@ -21,7 +21,8 @@ glm::vec3 Transformation::applyTranslation(c3ga::Mvec<double> vect) {
 	std::cout << vect[c3ga::E123i] << std::endl;
 	std::cout << vect[c3ga::E0123i] << std::endl;
 	*/
-	return glm::vec3(vect[c3ga::E0123], vect[c3ga::E123i], vect[c3ga::E0123i]);
+	translate(vect);
+	return glm::vec3(vect[c3ga::E0123], vect[c3ga::E123i] + 0.5, vect[c3ga::E0123i]);
 }
 
 c3ga::Mvec<double> Transformation::rotate(c3ga::Mvec<double> vect, c3ga::Mvec<double> biVect, double angle) {
@@ -42,5 +43,9 @@ c3ga::Mvec<double> Transformation::scale(c3ga::Mvec<double> vect, double scale) 
 }
 
 glm::vec3 Transformation::applyScale(c3ga::Mvec<double> vect) {
-	return glm::vec3(vect[c3ga::E0123], 0, vect[c3ga::E123i]);
+	std::cout << vect[c3ga::E0123] << std::endl;
+	std::cout << vect[c3ga::E123i] << std::endl;
+	std::cout << vect[c3ga::E0123i] << std::endl;
+	scale(vect, 0.2);
+	return glm::vec3(vect[c3ga::E0123], vect[c3ga::E123i], 0);
 }

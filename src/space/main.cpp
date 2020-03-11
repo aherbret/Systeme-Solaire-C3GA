@@ -27,26 +27,6 @@ const GLuint VERTEX_ATTR_POSITION = 0;
 const GLuint VERTEX_ATTR_NORMAL = 1;
 const GLuint VERTEX_ATTR_TEXCOORD = 2;
 
-c3ga::Mvec<GLfloat> point(const GLfloat &x, const GLfloat &y, const GLfloat &z){
-    c3ga::Mvec<GLfloat> mv;
-    mv[c3ga::E1] = x;
-    mv[c3ga::E2] = y;
-    mv[c3ga::E3] = z;
-    mv[c3ga::Ei] = 0.5 * (x*x + y*y + z*z);
-    mv[c3ga::E0] = 1.0;
-
-    return mv;
-}
-
-// void drawSphere() {
-//     c3ga::Mvec<double> pt1 = point(1.0, 0.0, 0.0);
-//     c3ga::Mvec<double> pt2 = point(-1.0, 0.0, 0.0);
-//     c3ga::Mvec<double> pt3 = point(0.0,0.0,-1.0);
-//     c3ga::Mvec<double> pt4 = point(0.0,1.0,0.0);
-//     c3ga::Mvec<double> s = pt1 ^ pt2 ^ pt3 ^ pt4;
-
-// }
-
 int main(int argc, char** argv) {
 	int width_windows = 1350;
     int height_windows = 700;
@@ -75,16 +55,7 @@ int main(int argc, char** argv) {
 
     Sphere sphere(1, 32, 16); // rayon = 1, latitude = 32, longitude = 16
 
-    Sphere sphere2(1, 32, 16); // rayon = 1, latitude = 32, longitude = 16
-
-    Transformation t;
-    std::cout << sphere2.getSphere() << std::endl;
-
-    sphere2.setSphere(t.rotate(sphere2.getSphere() ));
-    std::cout << sphere2.getSphere() << std::endl;
-
-    //Sphere sphere(point(1.0,2.0,0.0), 32, 16); // rayon = 1, latitude = 32, longitude = 16
-    //sphere.buildC3GA();
+    Transformation transfo;
     
     // SkyBox
     float size_cube = 1;
@@ -159,13 +130,6 @@ int main(int argc, char** argv) {
     glVertexAttribPointer(VERTEX_ATTR_TEXCOORD, 2, GL_FLOAT, GL_FALSE,  sizeof(ShapeVertex), (const GLvoid *)(offsetof(ShapeVertex, texCoords)));
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
-
-    std::vector<glm::vec3> AxesRotation;
-    std::vector<glm::vec3> Translations;
-    for (int i = 0; i < 32; ++i) { 
-        AxesRotation.push_back(glm::sphericalRand(1.0f));
-        Translations.push_back(glm::sphericalRand(2.0f));
-    }
     
     glm::ivec2 lastmousePos;
     bool flag = false;
@@ -206,27 +170,15 @@ int main(int argc, char** argv) {
             flag = false;
         }
         //Ici on récupère les touches du clavier
-        if (windowManager.isKeyPressed(SDLK_LCTRL) == true) {
-            speedcam = defaultspeed * boost_speed;
-        }
-        else {
-            speedcam = defaultspeed;
-        }
+        if (windowManager.isKeyPressed(SDLK_LCTRL) == true) { speedcam = defaultspeed * boost_speed; }
+        else { speedcam = defaultspeed; }
 
-        if (windowManager.isKeyPressed(SDLK_z) == true) {
-            Camera.moveFront(speedcam);
-        }
-        if (windowManager.isKeyPressed(SDLK_q) == true) {
-            Camera.moveLeft(speedcam);
-        }
+        if (windowManager.isKeyPressed(SDLK_z) == true) { Camera.moveFront(speedcam); }
+        if (windowManager.isKeyPressed(SDLK_q) == true) { Camera.moveLeft(speedcam); }
 
-        if (windowManager.isKeyPressed(SDLK_s) == true) {
-            Camera.moveFront(-speedcam);
-        }
+        if (windowManager.isKeyPressed(SDLK_s) == true) { Camera.moveFront(-speedcam); }
 
-        if (windowManager.isKeyPressed(SDLK_d) == true) {
-            Camera.moveLeft(-speedcam);
-        }
+        if (windowManager.isKeyPressed(SDLK_d) == true) { Camera.moveLeft(-speedcam); }
         //// Fin Gestion de la camera
 
         /*********************************
@@ -238,10 +190,6 @@ int main(int argc, char** argv) {
         // Affichage de la skybox
         glm::mat4  VMatrix = Camera.getViewMatrix();
         skybox.activeSkyBox(skytex, texSpatial, distRendu, ratio_h_w, VMatrix);
-
-
-
-
 
         glBindVertexArray(vao);
 
@@ -260,41 +208,26 @@ int main(int argc, char** argv) {
         tex.activeAndBindTexture(GL_TEXTURE0, 0); // la texture earthTexture est bindée sur l'unité GL_TEXTURE0
         glUniform1i(sunProgram.uTexture, 0);
 
-        // Specify the value of a uniform variable for the current program object
-        // glUniformMatrix4fv(sunProgram.uMVMatrix, 1, GL_FALSE, glm::value_ptr(sunMVMatrix));
-        // glUniformMatrix4fv(sunProgram.uNormalMatrix, 1, GL_FALSE, glm::value_ptr(glm::transpose(glm::inverse(sunMVMatrix))));
-        // glUniformMatrix4fv(sunProgram.uMVPMatrix, 1, GL_FALSE, glm::value_ptr(ProjMatrix * sunMVMatrix));
-        // tex.activeAndBindTexture(GL_TEXTURE0, texture[1]);
-        // glDrawArrays(GL_TRIANGLES, 0, sphere2.getVertexCount());
-        // glActiveTexture(GL_TEXTURE0);
-        // tex.activeAndBindTexture(GL_TEXTURE0, 0); // la texture earthTexture est bindée sur l'unité GL_TEXTURE0
-        // tex.activeAndBindTexture(GL_TEXTURE1, 0); // la texture cloudTexture est bindée sur l'unité GL_TEXTURE1
-        // glUniform1i(sunProgram.uTexture, 0);
-
-        // Soleil (grande) avec C3GA
+        // Lune avec C3GA
         moonProgram.m_Program.use();
         glUniform1i(moonProgram.uTexture, 0);
 
-        glm::mat4 MVMatrix = glm::translate(glm::mat4(1), glm::vec3(0, 0, -5)); // Translation
-        glm::mat4 NormalMatrix = glm::transpose(glm::inverse(MVMatrix));
-        MVMatrix = glm::rotate(MVMatrix, windowManager.getTime(), glm::vec3(0, 1, 0)); // Translation * Rotation
-        //MVMatrix = glm::translate(MVMatrix, glm::vec3(-2, 1.36, 1.2)); // Translation * Rotation * Translation
-        MVMatrix = glm::translate(MVMatrix, t.applyTranslation(sphere2.getSphere()));
-
-
-        ///MVMatrix = glm::scale(MVMatrix, glm::vec3(0.2, 0.2, 0.2)); // Translation * Rotation * Translation * Scale
-
-        
-       
-        glUniformMatrix4fv(moonProgram.uMVPMatrix, 1, GL_FALSE, glm::value_ptr(ProjMatrix * MVMatrix));
-        glUniformMatrix4fv(moonProgram.uMVMatrix, 1, GL_FALSE, glm::value_ptr(MVMatrix));
-        NormalMatrix = glm::transpose(glm::inverse(MVMatrix));
-        glUniformMatrix4fv(moonProgram.uNormalMatrix, 1, GL_FALSE, glm::value_ptr(NormalMatrix));
+        glm::mat4 moonMVMatrix = glm::rotate(globalMVMatrix, windowManager.getTime(), glm::vec3(0, 1, 0)); // Translation * Rotation
+        moonMVMatrix = glm::translate(moonMVMatrix, transfo.applyTranslation(sphere.getSphere()));
+        // moonMVMatrix = glm::scale(moonMVMatrix, glm::vec3(0.2, 0.2, 0.2)); // Translation * Rotation * Translation * Scale
+        moonMVMatrix = glm::scale(moonMVMatrix, transfo.applyScale(sphere.getSphere()));
+        std::cout << sphere.getSphere() << std::endl;
+        // Specify the value of a uniform variable for the current program object
+        glUniformMatrix4fv(moonProgram.uMVMatrix, 1, GL_FALSE, glm::value_ptr(moonMVMatrix));
+        glUniformMatrix4fv(moonProgram.uNormalMatrix, 1, GL_FALSE, glm::value_ptr(glm::transpose(glm::inverse(moonMVMatrix))));
+        glUniformMatrix4fv(moonProgram.uMVPMatrix, 1, GL_FALSE, glm::value_ptr(ProjMatrix * moonMVMatrix));
 		tex.activeAndBindTexture(GL_TEXTURE0, texture[1]);
-        glDrawArrays(GL_TRIANGLES, 0, sphere2.getVertexCount());
+        glDrawArrays(GL_TRIANGLES, 0, sphere.getVertexCount());
         glActiveTexture(GL_TEXTURE0);
         tex.activeAndBindTexture(GL_TEXTURE0, 0); // la texture earthTexture est bindée sur l'unité GL_TEXTURE2
         glUniform1i(moonProgram.uTexture, 0);
+
+
 
 
         glBindVertexArray(0);
