@@ -7,7 +7,7 @@
 #include "c3ga/c3gaTools.hpp"
 
 
-c3ga::Mvec<double> Transformation::translate(c3ga::Mvec<double> vect, c3ga::Mvec<double> translation, double facteur) {
+c3ga::Mvec<double> Transformation::translate(c3ga::Mvec<double> vect, double facteur, c3ga::Mvec<double> translation) {
 	//c3ga::Mvec<double> translation = c3ga::e1<double>();
     //double facteur = 1;
     c3ga::Mvec<double> translator = 1 - 0.5 * translation * c3ga::ei<double>() * facteur;    
@@ -15,6 +15,7 @@ c3ga::Mvec<double> Transformation::translate(c3ga::Mvec<double> vect, c3ga::Mvec
 	return vect;
 }
 
+/* Le premier paramètre du return DOIT être changé plus tard, car la translation qui en résulte n'est pas correcte */
 glm::vec3 Transformation::applyTranslationX(Sphere sphere) {
 	/*
 	std::cout << vect[c3ga::E0123] << std::endl;
@@ -22,7 +23,7 @@ glm::vec3 Transformation::applyTranslationX(Sphere sphere) {
 	std::cout << vect[c3ga::E0123i] << std::endl;
 	*/
 	c3ga::Mvec<double> s = sphere.getSphere();
-	return glm::vec3(abs(s[c3ga::E0123]) + 1.5, 0, 0);
+	return glm::vec3(abs(s[c3ga::E0123]) + abs(s[c3ga::E123i]) + abs(s[c3ga::E0123i]), 0, 0);
 }
 
 c3ga::Mvec<double> Transformation::rotate(c3ga::Mvec<double> vect, c3ga::Mvec<double> biVect, double angle) {
@@ -30,6 +31,11 @@ c3ga::Mvec<double> Transformation::rotate(c3ga::Mvec<double> vect, c3ga::Mvec<do
 	vect = rotor * vect * rotor.inv();
 	vect.roundZero(1.0e-10);
     return vect;
+}
+
+glm::vec3 Transformation::applyRotation(Sphere sphere) {
+	c3ga::Mvec<double> s = sphere.getSphere();
+	return glm::vec3(s[c3ga::E0123], s[c3ga::E0123], s[c3ga::E0123]);
 }
 
 
