@@ -8,6 +8,7 @@
 #include <glimac/glm.hpp>
 #include <glimac/Image.hpp>
 #include <glimac/Cube.hpp>
+#include <glimac/Tore.hpp>
 #include <glimac/Geometry.hpp>
 #include <cstddef>
 #include <vector>
@@ -26,6 +27,30 @@ const std::string TEXTURE_DIR = "../assets/textures";
 const GLuint VERTEX_ATTR_POSITION = 0;
 const GLuint VERTEX_ATTR_NORMAL = 1;
 const GLuint VERTEX_ATTR_TEXCOORD = 2;
+
+
+/*
+void drawPlanet() {
+    venusProgram.m_Program.use();
+    glUniform1i(venusProgram.uTexture, 0);
+
+    glm::mat4 venusMVMatrix = glm::rotate(globalMVMatrix, windowManager.getTime(), glm::vec3(0, 1, 0)); // Translation * Rotation
+
+    venusMVMatrix = glm::translate(venusMVMatrix, translateVenus);
+    venusMVMatrix = glm::scale(venusMVMatrix, scaleVenus);
+    venusMVMatrix = glm::rotate(venusMVMatrix, windowManager.getTime(), rotateVenus);
+    
+    // Specify the value of a uniform variable for the current program object
+    glUniformMatrix4fv(venusProgram.uMVMatrix, 1, GL_FALSE, glm::value_ptr(venusMVMatrix));
+    glUniformMatrix4fv(venusProgram.uNormalMatrix, 1, GL_FALSE, glm::value_ptr(glm::transpose(glm::inverse(venusMVMatrix))));
+    glUniformMatrix4fv(venusProgram.uMVPMatrix, 1, GL_FALSE, glm::value_ptr(ProjMatrix * venusMVMatrix));
+    tex.activeAndBindTexture(GL_TEXTURE0, texture[5]);
+    glDrawArrays(GL_TRIANGLES, 0, sphere.getVertexCount());
+    glActiveTexture(GL_TEXTURE0);
+    tex.activeAndBindTexture(GL_TEXTURE0, 0); // la texture earthTexture est bindée sur l'unité GL_TEXTURE2
+    glUniform1i(venusProgram.uTexture, 0);
+}
+*/
 
 int main(int argc, char** argv) {
 	int width_windows = 1350;
@@ -51,9 +76,12 @@ int main(int argc, char** argv) {
     MultiTexProgram earthProgram(applicationPath);
     TexProgram sunProgram(applicationPath);
     TexProgram moonProgram(applicationPath);
+    TexProgram mercureProgram(applicationPath);
+    TexProgram venusProgram(applicationPath);
     Skytext skytex(applicationPath);
 
     Sphere sphere(1, 32, 16); // rayon = 1, latitude = 32, longitude = 16
+    Tore tore(0.1, 1, 72, 36);
 
     Transformation transfo;
     // std::cout << sphere.getSphere() << std::endl;
@@ -104,16 +132,22 @@ int main(int argc, char** argv) {
     std::unique_ptr<Image> MoonMap = loadImage("../assets/textures/MoonMap.jpg");
     std::unique_ptr<Image> CloudMap = loadImage("../assets/textures/CloudMap.jpg");
     std::unique_ptr<Image> EarthMap = loadImage("../assets/textures/EarthMap.jpg");
-    if (SunMap == NULL || MoonMap == NULL || CloudMap == NULL || EarthMap == NULL) {
+    std::unique_ptr<Image> MercureMap = loadImage("../assets/textures/Mercure.jpg");
+    std::unique_ptr<Image> VenusMap = loadImage("../assets/textures/Venus.jpg");
+
+    if (SunMap == NULL || MoonMap == NULL || CloudMap == NULL || EarthMap == NULL
+        || MercureMap == NULL || VenusMap == NULL) {
         std::cerr << "Une des textures n'a pas pu etre chargée. \n" << std::endl;
         exit(0);
     }
-    GLuint texture[4];
-    glGenTextures(3, texture);
+    GLuint texture[6];
+    glGenTextures(5, texture);
     tex.firstBindTexture(SunMap, texture[0]); //Binding de la texture SunMap
     tex.firstBindTexture(MoonMap, texture[1]); //Binding de la texture MoonMap
     tex.firstBindTexture(CloudMap, texture[2]); //Binding de la texture CloudMap
     tex.firstBindTexture(EarthMap, texture[3]); //Binding de la texture EarthMap
+    tex.firstBindTexture(MercureMap, texture[4]); //Binding de la texture MercureMap
+    tex.firstBindTexture(VenusMap, texture[5]); //Binding de la texture VenusMap
     //// Fin Textures planetes
 
     GLuint vbo;
@@ -142,6 +176,39 @@ int main(int argc, char** argv) {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
     
+
+    /* Tore */
+
+    GLuint vbo_tore;
+    glGenBuffers(1, &vbo_tore);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo_tore);
+
+    glEnable(GL_DEPTH_TEST);
+    glm::mat4 ProjMatrixTore = glm::perspective(glm::radians(70.f), 800.f/600.f, 0.1f, 100.f);
+
+    glBufferData(GL_ARRAY_BUFFER, tore.getVertexCount() * sizeof(ShapeVertex), tore.getDataPointer(), GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    GLuint vao_tore;
+    glGenVertexArrays(1, &vao_tore);
+    glBindVertexArray(vao_tore);
+    
+    glEnableVertexAttribArray(VERTEX_ATTR_POSITION);
+    glEnableVertexAttribArray(VERTEX_ATTR_NORMAL);
+    glEnableVertexAttribArray(VERTEX_ATTR_TEXCOORD);
+
+    glBindBuffer(GL_ARRAY_BUFFER, vbo_tore);
+
+    glVertexAttribPointer(VERTEX_ATTR_POSITION, 3, GL_FLOAT, GL_FALSE,  sizeof(ShapeVertex), (const GLvoid *)(offsetof(ShapeVertex, position)));
+    glVertexAttribPointer(VERTEX_ATTR_NORMAL, 3, GL_FLOAT, GL_FALSE,  sizeof(ShapeVertex), (const GLvoid *)(offsetof(ShapeVertex, normal)));
+    glVertexAttribPointer(VERTEX_ATTR_TEXCOORD, 2, GL_FLOAT, GL_FALSE,  sizeof(ShapeVertex), (const GLvoid *)(offsetof(ShapeVertex, texCoords)));
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+
+
+
+
+
     glm::ivec2 lastmousePos;
     bool flag = false;
     FreeflyCamera Camera;
@@ -155,13 +222,13 @@ int main(int argc, char** argv) {
     /* Mercure */
         /* Translation */
         sphere.setSphere(transfo.translate(sphere.getSphere()));
-        glm::vec3 translateLune = transfo.applyTranslationX(sphere);
+        glm::vec3 translateMercure = transfo.applyTranslationX(sphere);
         /* Scale */
         sphere.setSphere(transfo.scale(sphere.getSphere(), 5));
-        glm::vec3 scaleLune = transfo.applyScale(sphere);
+        glm::vec3 scaleMercure = transfo.applyScale(sphere);
         /* Rotation */
         sphere.setSphere(transfo.rotate(sphere.getSphere()));
-        glm::vec3 rotateLune = transfo.applyRotation(sphere);
+        glm::vec3 rotateMercure = transfo.applyRotation(sphere);
     /* Venus */
         /* Translation */
         std::cout << sphere.getSphere() << std::endl;
@@ -169,9 +236,9 @@ int main(int argc, char** argv) {
         glm::vec3 translateVenus = transfo.applyTranslationX(sphere);
         std::cout << sphere.getSphere() << std::endl;
         /* Scale */
-        glm::vec3 scaleVenus = scaleLune;
+        glm::vec3 scaleVenus = scaleMercure;
         /* Rotation */
-        glm::vec3 rotateVenus = rotateLune;
+        glm::vec3 rotateVenus = rotateMercure;
 
 
     while (!done) {
@@ -243,30 +310,29 @@ int main(int argc, char** argv) {
         glUniform1i(sunProgram.uTexture, 0);
 
         // Mercure avec C3GA
-        moonProgram.m_Program.use();
-        glUniform1i(moonProgram.uTexture, 0);
+        mercureProgram.m_Program.use();
+        glUniform1i(mercureProgram.uTexture, 0);
 
-        glm::mat4 moonMVMatrix = glm::rotate(globalMVMatrix, windowManager.getTime(), glm::vec3(0, 1, 0)); // Translation * Rotation
+        glm::mat4 mercureMVMatrix = glm::rotate(globalMVMatrix, windowManager.getTime(), glm::vec3(0, 1, 0)); // Translation * Rotation
 
-        moonMVMatrix = glm::translate(moonMVMatrix, translateLune);
-        moonMVMatrix = glm::scale(moonMVMatrix, scaleLune);
-        moonMVMatrix = glm::rotate(moonMVMatrix, windowManager.getTime(), rotateLune);
+        mercureMVMatrix = glm::translate(mercureMVMatrix, translateMercure);
+        mercureMVMatrix = glm::scale(mercureMVMatrix, scaleMercure);
+        mercureMVMatrix = glm::rotate(mercureMVMatrix, windowManager.getTime(), rotateMercure);
         
         // Specify the value of a uniform variable for the current program object
-        glUniformMatrix4fv(moonProgram.uMVMatrix, 1, GL_FALSE, glm::value_ptr(moonMVMatrix));
-        glUniformMatrix4fv(moonProgram.uNormalMatrix, 1, GL_FALSE, glm::value_ptr(glm::transpose(glm::inverse(moonMVMatrix))));
-        glUniformMatrix4fv(moonProgram.uMVPMatrix, 1, GL_FALSE, glm::value_ptr(ProjMatrix * moonMVMatrix));
-		tex.activeAndBindTexture(GL_TEXTURE0, texture[1]);
+        glUniformMatrix4fv(mercureProgram.uMVMatrix, 1, GL_FALSE, glm::value_ptr(mercureMVMatrix));
+        glUniformMatrix4fv(mercureProgram.uNormalMatrix, 1, GL_FALSE, glm::value_ptr(glm::transpose(glm::inverse(mercureMVMatrix))));
+        glUniformMatrix4fv(mercureProgram.uMVPMatrix, 1, GL_FALSE, glm::value_ptr(ProjMatrix * mercureMVMatrix));
+		tex.activeAndBindTexture(GL_TEXTURE0, texture[4]);
         glDrawArrays(GL_TRIANGLES, 0, sphere.getVertexCount());
         glActiveTexture(GL_TEXTURE0);
         tex.activeAndBindTexture(GL_TEXTURE0, 0); // la texture earthTexture est bindée sur l'unité GL_TEXTURE2
-        glUniform1i(moonProgram.uTexture, 0);
+        glUniform1i(mercureProgram.uTexture, 0);
 
 
         // Venus avec C3GA
-        earthProgram.m_Program.use();
-        glUniform1i(earthProgram.uEarthTexture, 0);
-        glUniform1i(earthProgram.uCloudTexture, 1);
+        venusProgram.m_Program.use();
+        glUniform1i(venusProgram.uTexture, 0);
 
         glm::mat4 venusMVMatrix = glm::rotate(globalMVMatrix, windowManager.getTime(), glm::vec3(0, 1, 0)); // Translation * Rotation
 
@@ -275,17 +341,35 @@ int main(int argc, char** argv) {
         venusMVMatrix = glm::rotate(venusMVMatrix, windowManager.getTime(), rotateVenus);
         
         // Specify the value of a uniform variable for the current program object
-        glUniformMatrix4fv(earthProgram.uMVMatrix, 1, GL_FALSE, glm::value_ptr(venusMVMatrix));
-        glUniformMatrix4fv(earthProgram.uNormalMatrix, 1, GL_FALSE, glm::value_ptr(glm::transpose(glm::inverse(venusMVMatrix))));
-        glUniformMatrix4fv(earthProgram.uMVPMatrix, 1, GL_FALSE, glm::value_ptr(ProjMatrix * venusMVMatrix));
-        tex.activeAndBindTexture(GL_TEXTURE0, texture[3]);
-        tex.activeAndBindTexture(GL_TEXTURE1, texture[2]);
+        glUniformMatrix4fv(venusProgram.uMVMatrix, 1, GL_FALSE, glm::value_ptr(venusMVMatrix));
+        glUniformMatrix4fv(venusProgram.uNormalMatrix, 1, GL_FALSE, glm::value_ptr(glm::transpose(glm::inverse(venusMVMatrix))));
+        glUniformMatrix4fv(venusProgram.uMVPMatrix, 1, GL_FALSE, glm::value_ptr(ProjMatrix * venusMVMatrix));
+        tex.activeAndBindTexture(GL_TEXTURE0, texture[5]);
         glDrawArrays(GL_TRIANGLES, 0, sphere.getVertexCount());
         glActiveTexture(GL_TEXTURE0);
         tex.activeAndBindTexture(GL_TEXTURE0, 0); // la texture earthTexture est bindée sur l'unité GL_TEXTURE2
-        tex.activeAndBindTexture(GL_TEXTURE1, 0);
-        glUniform1i(earthProgram.uEarthTexture, 0);
+        glUniform1i(venusProgram.uTexture, 0);
 
+        glBindVertexArray(0);
+
+        // Tore avec C3GA
+        glBindVertexArray(vao_tore);
+        venusProgram.m_Program.use();
+        glUniform1i(venusProgram.uTexture, 0);
+
+        venusMVMatrix = glm::rotate(globalMVMatrix, windowManager.getTime(), glm::vec3(0, 1, 0)); // Translation * Rotation
+
+        venusMVMatrix = glm::rotate(venusMVMatrix, windowManager.getTime(), glm::vec3(0, 1, 0));
+        
+        // Specify the value of a uniform variable for the current program object
+        glUniformMatrix4fv(venusProgram.uMVMatrix, 1, GL_FALSE, glm::value_ptr(venusMVMatrix));
+        glUniformMatrix4fv(venusProgram.uNormalMatrix, 1, GL_FALSE, glm::value_ptr(glm::transpose(glm::inverse(venusMVMatrix))));
+        glUniformMatrix4fv(venusProgram.uMVPMatrix, 1, GL_FALSE, glm::value_ptr(ProjMatrix * venusMVMatrix));
+        tex.activeAndBindTexture(GL_TEXTURE0, texture[5]);
+        glDrawArrays(GL_TRIANGLES, 0, tore.getVertexCount());
+        glActiveTexture(GL_TEXTURE0);
+        tex.activeAndBindTexture(GL_TEXTURE0, 0); // la texture earthTexture est bindée sur l'unité GL_TEXTURE2
+        glUniform1i(venusProgram.uTexture, 0);
 
 
         glBindVertexArray(0);
