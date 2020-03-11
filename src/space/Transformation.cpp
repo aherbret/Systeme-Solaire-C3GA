@@ -7,22 +7,24 @@
 #include "c3ga/c3gaTools.hpp"
 
 
-c3ga::Mvec<double> Transformation::translate(c3ga::Mvec<double> vect, c3ga::Mvec<double> translation, double facteur) {
+void Transformation::translate(Sphere sphere, c3ga::Mvec<double> translation, double facteur) {
 	//c3ga::Mvec<double> translation = c3ga::e1<double>();
     //double facteur = 1;
+    c3ga::Mvec<double> s = sphere.getSphere();
     c3ga::Mvec<double> translator = 1 - 0.5 * translation * c3ga::ei<double>() * facteur;    
-	vect = translator * vect * translator.inv();
-    return vect;
+	s = translator * s * translator.inv();
+	sphere.setSphere(s);
 }
 
-glm::vec3 Transformation::applyTranslation(c3ga::Mvec<double> vect) {
+glm::vec3 Transformation::applyTranslation(Sphere sphere) {
 	/*
 	std::cout << vect[c3ga::E0123] << std::endl;
 	std::cout << vect[c3ga::E123i] << std::endl;
 	std::cout << vect[c3ga::E0123i] << std::endl;
 	*/
-	translate(vect);
-	return glm::vec3(vect[c3ga::E0123], vect[c3ga::E123i] + 0.5, vect[c3ga::E0123i]);
+	translate(sphere);
+	c3ga::Mvec<double> s = sphere.getSphere();
+	return glm::vec3(s[c3ga::E0123], s[c3ga::E123i] + 0.5, s[c3ga::E0123i]);
 }
 
 c3ga::Mvec<double> Transformation::rotate(c3ga::Mvec<double> vect, c3ga::Mvec<double> biVect, double angle) {
@@ -34,18 +36,23 @@ c3ga::Mvec<double> Transformation::rotate(c3ga::Mvec<double> vect, c3ga::Mvec<do
     return vect;
 }
 
-c3ga::Mvec<double> Transformation::scale(c3ga::Mvec<double> vect, double scale) {
+void Transformation::scale(Sphere sphere, double scale) {
 	//double scale = 2.;
+	c3ga::Mvec<double> s = sphere.getSphere();
     c3ga::Mvec<double> dilator = 1. - ((1. - scale) / (1. + scale)) * c3ga::e0i<double>();  
-	vect = dilator * vect * dilator.inv();
-	vect.roundZero(1.0e-10);
-    return vect;
+	s = dilator * s * dilator.inv();
+	//vect.roundZero(1.0e-10);
+	sphere.setSphere(s);
 }
 
-glm::vec3 Transformation::applyScale(c3ga::Mvec<double> vect) {
+glm::vec3 Transformation::applyScale(Sphere sphere) {
+	
+	scale(sphere, 10);
+	/*
 	std::cout << vect[c3ga::E0123] << std::endl;
 	std::cout << vect[c3ga::E123i] << std::endl;
 	std::cout << vect[c3ga::E0123i] << std::endl;
-	scale(vect, 0.2);
-	return glm::vec3(vect[c3ga::E0123], vect[c3ga::E123i], 0);
+	*/
+	c3ga::Mvec<double> s = sphere.getSphere();
+	return glm::vec3(s[c3ga::E0123], s[c3ga::E123i], 0);
 }

@@ -56,6 +56,11 @@ int main(int argc, char** argv) {
     Sphere sphere(1, 32, 16); // rayon = 1, latitude = 32, longitude = 16
 
     Transformation transfo;
+    sphere.setSphere(transfo.scale(sphere.getSphere(), 5));
+    //sphere.setSphere(transfo.translate(sphere.getSphere()));
+    std::cout << sphere.getSphere() << std::endl;
+
+   exit(EXIT_FAILURE);
     
     // SkyBox
     float size_cube = 1;
@@ -213,9 +218,10 @@ int main(int argc, char** argv) {
         glUniform1i(moonProgram.uTexture, 0);
 
         glm::mat4 moonMVMatrix = glm::rotate(globalMVMatrix, windowManager.getTime(), glm::vec3(0, 1, 0)); // Translation * Rotation
-        moonMVMatrix = glm::translate(moonMVMatrix, transfo.applyTranslation(sphere.getSphere()));
-        // moonMVMatrix = glm::scale(moonMVMatrix, glm::vec3(0.2, 0.2, 0.2)); // Translation * Rotation * Translation * Scale
-        moonMVMatrix = glm::scale(moonMVMatrix, transfo.applyScale(sphere.getSphere()));
+        moonMVMatrix = glm::translate(moonMVMatrix, transfo.applyTranslation(sphere));
+        //moonMVMatrix = glm::translate(moonMVMatrix, transfo.applyTranslation(sphere.getSphere()));
+        //moonMVMatrix = glm::scale(moonMVMatrix, glm::vec3(0.2, 0.2, 0.2)); // Translation * Rotation * Translation * Scale
+        moonMVMatrix = glm::scale(moonMVMatrix, transfo.applyScale(sphere));
         std::cout << sphere.getSphere() << std::endl;
         // Specify the value of a uniform variable for the current program object
         glUniformMatrix4fv(moonProgram.uMVMatrix, 1, GL_FALSE, glm::value_ptr(moonMVMatrix));
