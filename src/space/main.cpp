@@ -80,7 +80,7 @@ int main(int argc, char** argv) {
     Transformation t;
     std::cout << sphere2.getSphere() << std::endl;
 
-    sphere2.setSphere(t.translate(sphere2.getSphere()));
+    sphere2.setSphere(t.rotate(sphere2.getSphere() ));
     std::cout << sphere2.getSphere() << std::endl;
 
     //Sphere sphere(point(1.0,2.0,0.0), 32, 16); // rayon = 1, latitude = 32, longitude = 16
@@ -278,7 +278,10 @@ int main(int argc, char** argv) {
         glm::mat4 MVMatrix = glm::translate(glm::mat4(1), glm::vec3(0, 0, -5)); // Translation
         glm::mat4 NormalMatrix = glm::transpose(glm::inverse(MVMatrix));
         MVMatrix = glm::rotate(MVMatrix, windowManager.getTime(), glm::vec3(0, 1, 0)); // Translation * Rotation
-        MVMatrix = glm::translate(MVMatrix, glm::vec3(-2, -0.4, 0.96)); // Translation * Rotation * Translation
+        //MVMatrix = glm::translate(MVMatrix, glm::vec3(-2, 1.36, 1.2)); // Translation * Rotation * Translation
+        MVMatrix = glm::translate(MVMatrix, t.applyTranslation(sphere2.getSphere()));
+
+
         ///MVMatrix = glm::scale(MVMatrix, glm::vec3(0.2, 0.2, 0.2)); // Translation * Rotation * Translation * Scale
 
         
