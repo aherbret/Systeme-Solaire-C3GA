@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 
-PROJECT(test)
+PROJECT(SystemeSolaire)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/CMake)
 
@@ -33,7 +33,7 @@ file(GLOB_RECURSE SOURCE_FILES ${CMAKE_SOURCE_DIR}/src/*.cpp)
 file(GLOB_RECURSE HEADER_FILES ${CMAKE_SOURCE_DIR}/include/*.hpp)
 file(GLOB_RECURSE SHADER_FILES ${CMAKE_SOURCE_DIR}/shaders/*.glsl)
 
-set(TARGET_NAME test)
+set(TARGET_NAME SystemeSolaire)
 ADD_EXECUTABLE(${TARGET_NAME} 
                 ${SOURCE_FILES} 
                 ${HEADER_FILES} 

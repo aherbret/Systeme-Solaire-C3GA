@@ -26,7 +26,7 @@ glm::vec3 Transformation::applyTranslationX(Sphere sphere) {
 	return glm::vec3(abs(s[c3ga::E0123]) + abs(s[c3ga::E123i]) + abs(s[c3ga::E0123i]), 0, 0);
 }
 
-c3ga::Mvec<double> Transformation::rotate(c3ga::Mvec<double> vect, c3ga::Mvec<double> biVect, double angle) {
+c3ga::Mvec<double> Transformation::rotate(c3ga::Mvec<double> vect, double angle, c3ga::Mvec<double> biVect) {
     c3ga::Mvec<double> rotor = cos(0.5 * angle * M_PI/180) - biVect * sin(0.5 * angle * M_PI/180);    
 	vect = rotor * vect * rotor.inv();
 	vect.roundZero(1.0e-10);
@@ -37,6 +37,14 @@ glm::vec3 Transformation::applyRotation(Sphere sphere) {
 	c3ga::Mvec<double> s = sphere.getSphere();
 	return glm::vec3(s[c3ga::E0123], s[c3ga::E0123], s[c3ga::E0123]);
 }
+
+// glm::vec3 Transformation::applyRotation2(Sphere sphere) {
+// 	c3ga::Mvec<double> s = sphere.getSphere();
+// 	std::cout << s[c3ga::E0123] << std::endl;
+// 	std::cout << s[c3ga::E0123i] << std::endl;
+// 	std::cout << s[c3ga::E023i] << std::endl;
+// 	return glm::vec3(s[c3ga::E0123], 0, s[c3ga::E123i]);
+// }
 
 
 c3ga::Mvec<double> Transformation::scale(c3ga::Mvec<double> vect, double scale) {

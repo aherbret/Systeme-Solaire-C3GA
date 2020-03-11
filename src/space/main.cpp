@@ -29,28 +29,28 @@ const GLuint VERTEX_ATTR_NORMAL = 1;
 const GLuint VERTEX_ATTR_TEXCOORD = 2;
 
 
-/*
-void drawPlanet() {
-    venusProgram.m_Program.use();
-    glUniform1i(venusProgram.uTexture, 0);
+void drawPlanet(Sphere & sphere, TexProgram & program, Texture & tex, GLuint tex_planet, SDLWindowManager & windowManager, glm::mat4 & globalMVMatrix, glm::mat4 & ProjMatrix, glm::vec3 & rotateGlobal,
+    glm::vec3 & translate, glm::vec3 & scale, glm::vec3 & rotate) {
+    program.m_Program.use();
+    glUniform1i(program.uTexture, 0);
 
-    glm::mat4 venusMVMatrix = glm::rotate(globalMVMatrix, windowManager.getTime(), glm::vec3(0, 1, 0)); // Translation * Rotation
+    //glm::mat4 MVMatrix = glm::rotate(globalMVMatrix, windowManager.getTime(), glm::vec3(0, 1, 0)); // Translation * Rotation
+    glm::mat4 MVMatrix = glm::rotate(globalMVMatrix, windowManager.getTime(), rotateGlobal);
 
-    venusMVMatrix = glm::translate(venusMVMatrix, translateVenus);
-    venusMVMatrix = glm::scale(venusMVMatrix, scaleVenus);
-    venusMVMatrix = glm::rotate(venusMVMatrix, windowManager.getTime(), rotateVenus);
+    MVMatrix = glm::translate(MVMatrix, translate);
+    MVMatrix = glm::scale(MVMatrix, scale);
+    MVMatrix = glm::rotate(MVMatrix, windowManager.getTime(), rotate);
     
     // Specify the value of a uniform variable for the current program object
-    glUniformMatrix4fv(venusProgram.uMVMatrix, 1, GL_FALSE, glm::value_ptr(venusMVMatrix));
-    glUniformMatrix4fv(venusProgram.uNormalMatrix, 1, GL_FALSE, glm::value_ptr(glm::transpose(glm::inverse(venusMVMatrix))));
-    glUniformMatrix4fv(venusProgram.uMVPMatrix, 1, GL_FALSE, glm::value_ptr(ProjMatrix * venusMVMatrix));
-    tex.activeAndBindTexture(GL_TEXTURE0, texture[5]);
+    glUniformMatrix4fv(program.uMVMatrix, 1, GL_FALSE, glm::value_ptr(MVMatrix));
+    glUniformMatrix4fv(program.uNormalMatrix, 1, GL_FALSE, glm::value_ptr(glm::transpose(glm::inverse(MVMatrix))));
+    glUniformMatrix4fv(program.uMVPMatrix, 1, GL_FALSE, glm::value_ptr(ProjMatrix * MVMatrix));
+    tex.activeAndBindTexture(GL_TEXTURE0, tex_planet);
     glDrawArrays(GL_TRIANGLES, 0, sphere.getVertexCount());
     glActiveTexture(GL_TEXTURE0);
     tex.activeAndBindTexture(GL_TEXTURE0, 0); // la texture earthTexture est bindée sur l'unité GL_TEXTURE2
-    glUniform1i(venusProgram.uTexture, 0);
+    glUniform1i(program.uTexture, 0);
 }
-*/
 
 int main(int argc, char** argv) {
 	int width_windows = 1350;
@@ -94,7 +94,7 @@ int main(int argc, char** argv) {
     // std::cout << transfo.applyScale(sphere) << std::endl;
     // glm::vec3 scalescale = transfo.applyScale(sphere);
 
-   //exit(EXIT_FAILURE);
+    //exit(EXIT_FAILURE);
     
     // SkyBox
     float size_cube = 1;
@@ -219,6 +219,9 @@ int main(int argc, char** argv) {
     bool done = false;
 
     
+    //sphere.setSphere(transfo.rotate(sphere.getSphere(), 0, c3ga::e23<double>()));
+    //glm::vec3 rotateGlobal = transfo.applyRotation(sphere);
+    glm::vec3 rotateGlobal = glm::vec3(0, 1, 0);
     /* Mercure */
         /* Translation */
         sphere.setSphere(transfo.translate(sphere.getSphere()));
@@ -231,10 +234,10 @@ int main(int argc, char** argv) {
         glm::vec3 rotateMercure = transfo.applyRotation(sphere);
     /* Venus */
         /* Translation */
-        std::cout << sphere.getSphere() << std::endl;
+        //std::cout << sphere.getSphere() << std::endl;
         sphere.setSphere(transfo.translate(sphere.getSphere(), 5));
         glm::vec3 translateVenus = transfo.applyTranslationX(sphere);
-        std::cout << sphere.getSphere() << std::endl;
+        //std::cout << sphere.getSphere() << std::endl;
         /* Scale */
         glm::vec3 scaleVenus = scaleMercure;
         /* Rotation */
@@ -294,11 +297,12 @@ int main(int argc, char** argv) {
 
         glBindVertexArray(vao);
 
+        glm::mat4 globalMVMatrix = Camera.getViewMatrix();
+
         // Soleil (grande) avec OPENGL
         sunProgram.m_Program.use();
         glUniform1i(sunProgram.uTexture, 0);
-        glm::mat4 globalMVMatrix = Camera.getViewMatrix();
-        glm::mat4 sunMVMatrix = glm::rotate(globalMVMatrix, windowManager.getTime(), glm::vec3(0, 1, 0));
+        glm::mat4 sunMVMatrix = glm::rotate(globalMVMatrix, windowManager.getTime(), rotateGlobal);
         // Specify the value of a uniform variable for the current program object
         glUniformMatrix4fv(sunProgram.uMVMatrix, 1, GL_FALSE, glm::value_ptr(sunMVMatrix));
         glUniformMatrix4fv(sunProgram.uNormalMatrix, 1, GL_FALSE, glm::value_ptr(glm::transpose(glm::inverse(sunMVMatrix))));
@@ -309,6 +313,7 @@ int main(int argc, char** argv) {
         tex.activeAndBindTexture(GL_TEXTURE0, 0); // la texture earthTexture est bindée sur l'unité GL_TEXTURE0
         glUniform1i(sunProgram.uTexture, 0);
 
+        /*
         // Mercure avec C3GA
         mercureProgram.m_Program.use();
         glUniform1i(mercureProgram.uTexture, 0);
@@ -351,7 +356,18 @@ int main(int argc, char** argv) {
         glUniform1i(venusProgram.uTexture, 0);
 
         glBindVertexArray(0);
+        */
 
+
+        drawPlanet(sphere, venusProgram, tex, texture[4], windowManager,
+            globalMVMatrix, ProjMatrix, rotateGlobal, translateVenus, scaleVenus, rotateVenus);
+
+        drawPlanet(sphere, mercureProgram, tex, texture[5], windowManager,
+            globalMVMatrix, ProjMatrix, rotateGlobal, translateMercure, scaleMercure, rotateMercure);
+        glBindVertexArray(0);
+
+
+        /*
         // Tore avec C3GA
         glBindVertexArray(vao_tore);
         venusProgram.m_Program.use();
@@ -374,6 +390,7 @@ int main(int argc, char** argv) {
 
         glBindVertexArray(0);
         tex.activeAndBindTexture(GL_TEXTURE0, 0); // la texture moonTexture est bindée sur l'unité GL_TEXTURE0
+        */
 
         // Update the display
         windowManager.swapBuffers();
