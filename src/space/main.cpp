@@ -56,11 +56,17 @@ int main(int argc, char** argv) {
     Sphere sphere(1, 32, 16); // rayon = 1, latitude = 32, longitude = 16
 
     Transformation transfo;
-    sphere.setSphere(transfo.scale(sphere.getSphere(), 5));
-    //sphere.setSphere(transfo.translate(sphere.getSphere()));
-    std::cout << sphere.getSphere() << std::endl;
+    // std::cout << sphere.getSphere() << std::endl;
+    // //transfo.scale(sphere, 15);
+    // sphere.setSphere(transfo.scale2(sphere.getSphere(), 5));
+    // //transfo.applyScale(sphere);
+    // //sphere.setSphere(transfo.translate2(sphere.getSphere()));
+    // std::cout << sphere.getSphere() << std::endl;
 
-   exit(EXIT_FAILURE);
+    // std::cout << transfo.applyScale(sphere) << std::endl;
+    // glm::vec3 scalescale = transfo.applyScale(sphere);
+
+   //exit(EXIT_FAILURE);
     
     // SkyBox
     float size_cube = 1;
@@ -145,6 +151,14 @@ int main(int argc, char** argv) {
     // Application loop:
     bool done = false;
 
+    
+    
+    
+    sphere.setSphere(transfo.translate(sphere.getSphere()));
+    glm::vec3 translateLune = transfo.applyTranslationX(sphere);
+    sphere.setSphere(transfo.scale(sphere.getSphere(), 5));
+    glm::vec3 scaleLune = transfo.applyScale(sphere);
+
     while (!done) {
         //glm::mat4 ViewMatrix = Camera.getViewMatrix();
         // Event loop:
@@ -218,11 +232,10 @@ int main(int argc, char** argv) {
         glUniform1i(moonProgram.uTexture, 0);
 
         glm::mat4 moonMVMatrix = glm::rotate(globalMVMatrix, windowManager.getTime(), glm::vec3(0, 1, 0)); // Translation * Rotation
-        moonMVMatrix = glm::translate(moonMVMatrix, transfo.applyTranslation(sphere));
-        //moonMVMatrix = glm::translate(moonMVMatrix, transfo.applyTranslation(sphere.getSphere()));
-        //moonMVMatrix = glm::scale(moonMVMatrix, glm::vec3(0.2, 0.2, 0.2)); // Translation * Rotation * Translation * Scale
-        moonMVMatrix = glm::scale(moonMVMatrix, transfo.applyScale(sphere));
-        std::cout << sphere.getSphere() << std::endl;
+
+        moonMVMatrix = glm::translate(moonMVMatrix, translateLune);
+        moonMVMatrix = glm::scale(moonMVMatrix, scaleLune);
+        
         // Specify the value of a uniform variable for the current program object
         glUniformMatrix4fv(moonProgram.uMVMatrix, 1, GL_FALSE, glm::value_ptr(moonMVMatrix));
         glUniformMatrix4fv(moonProgram.uNormalMatrix, 1, GL_FALSE, glm::value_ptr(glm::transpose(glm::inverse(moonMVMatrix))));
