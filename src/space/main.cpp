@@ -73,7 +73,7 @@ int main(int argc, char** argv) {
      * HERE SHOULD COME THE INITIALIZATION CODE
      *********************************/
     FilePath applicationPath(argv[0]);
-    MultiTexProgram earthProgram(applicationPath);
+    TexProgram earthProgram(applicationPath);
     TexProgram sunProgram(applicationPath);
     TexProgram moonProgram(applicationPath);
     TexProgram mercureProgram(applicationPath);
@@ -235,13 +235,23 @@ int main(int argc, char** argv) {
     /* Venus */
         /* Translation */
         //std::cout << sphere.getSphere() << std::endl;
-        sphere.setSphere(transfo.translate(sphere.getSphere(), 5));
+        sphere.setSphere(transfo.translate(sphere.getSphere(), 0.5));
         glm::vec3 translateVenus = transfo.applyTranslationX(sphere);
         //std::cout << sphere.getSphere() << std::endl;
         /* Scale */
         glm::vec3 scaleVenus = scaleMercure;
         /* Rotation */
         glm::vec3 rotateVenus = rotateMercure;
+    /* Terre */
+        /* Translation */
+        //std::cout << sphere.getSphere() << std::endl;
+        sphere.setSphere(transfo.translate(sphere.getSphere(), 8.5));
+        glm::vec3 translateEarth = transfo.applyTranslationX(sphere);
+        //std::cout << sphere.getSphere() << std::endl;
+        /* Scale */
+        glm::vec3 scaleEarth = scaleMercure;
+        /* Rotation */
+        glm::vec3 rotateEarth = rotateMercure;
 
 
     while (!done) {
@@ -358,14 +368,38 @@ int main(int argc, char** argv) {
         glBindVertexArray(0);
         */
 
+        drawPlanet(sphere, mercureProgram, tex, texture[4], windowManager,
+            globalMVMatrix, ProjMatrix, rotateGlobal, translateMercure, scaleMercure, rotateMercure);
 
-        drawPlanet(sphere, venusProgram, tex, texture[4], windowManager,
+        drawPlanet(sphere, venusProgram, tex, texture[5], windowManager,
             globalMVMatrix, ProjMatrix, rotateGlobal, translateVenus, scaleVenus, rotateVenus);
 
-        drawPlanet(sphere, mercureProgram, tex, texture[5], windowManager,
-            globalMVMatrix, ProjMatrix, rotateGlobal, translateMercure, scaleMercure, rotateMercure);
-        glBindVertexArray(0);
 
+        // Terre avec C3GA
+        drawPlanet(sphere, earthProgram, tex, texture[3], windowManager,
+            globalMVMatrix, ProjMatrix, rotateGlobal, translateEarth, scaleEarth, rotateEarth);
+        // earthProgram.m_Program.use();
+        // glUniform1i(earthProgram.uEarthTexture, 0);
+        // glUniform1i(earthProgram.uCloudTexture, 1);
+
+        // glm::mat4 earthMVMatrix = glm::rotate(globalMVMatrix, windowManager.getTime(), rotateGlobal); // Translation * Rotation
+
+        // earthMVMatrix = glm::translate(earthMVMatrix, translateEarth);
+        // earthMVMatrix = glm::scale(earthMVMatrix, scaleEarth);
+        // earthMVMatrix = glm::rotate(earthMVMatrix, windowManager.getTime(), rotateEarth);
+        
+        // // Specify the value of a uniform variable for the current program object
+        // glUniformMatrix4fv(earthProgram.uMVMatrix, 1, GL_FALSE, glm::value_ptr(earthMVMatrix));
+        // glUniformMatrix4fv(earthProgram.uNormalMatrix, 1, GL_FALSE, glm::value_ptr(glm::transpose(glm::inverse(earthMVMatrix))));
+        // glUniformMatrix4fv(earthProgram.uMVPMatrix, 1, GL_FALSE, glm::value_ptr(ProjMatrix * earthMVMatrix));
+        // tex.activeAndBindTexture(GL_TEXTURE0, texture[3]);
+        // tex.activeAndBindTexture(GL_TEXTURE1, texture[2]);
+        // glDrawArrays(GL_TRIANGLES, 0, sphere.getVertexCount());
+        // tex.activeAndBindTexture(GL_TEXTURE0, 0);
+        // tex.activeAndBindTexture(GL_TEXTURE1, 0);
+        // //glUniform1i(earthProgram.uEarthTexture, 0);
+
+        glBindVertexArray(0);
 
         /*
         // Tore avec C3GA
