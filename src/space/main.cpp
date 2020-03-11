@@ -152,12 +152,27 @@ int main(int argc, char** argv) {
     bool done = false;
 
     
-    
-    
-    sphere.setSphere(transfo.translate(sphere.getSphere()));
-    glm::vec3 translateLune = transfo.applyTranslationX(sphere);
-    sphere.setSphere(transfo.scale(sphere.getSphere(), 5));
-    glm::vec3 scaleLune = transfo.applyScale(sphere);
+    /* Mercure */
+        /* Translation */
+        sphere.setSphere(transfo.translate(sphere.getSphere()));
+        glm::vec3 translateLune = transfo.applyTranslationX(sphere);
+        /* Scale */
+        sphere.setSphere(transfo.scale(sphere.getSphere(), 5));
+        glm::vec3 scaleLune = transfo.applyScale(sphere);
+        /* Rotation */
+        sphere.setSphere(transfo.rotate(sphere.getSphere()));
+        glm::vec3 rotateLune = transfo.applyRotation(sphere);
+    /* Venus */
+        /* Translation */
+        std::cout << sphere.getSphere() << std::endl;
+        sphere.setSphere(transfo.translate(sphere.getSphere(), 5));
+        glm::vec3 translateVenus = transfo.applyTranslationX(sphere);
+        std::cout << sphere.getSphere() << std::endl;
+        /* Scale */
+        glm::vec3 scaleVenus = scaleLune;
+        /* Rotation */
+        glm::vec3 rotateVenus = rotateLune;
+
 
     while (!done) {
         //glm::mat4 ViewMatrix = Camera.getViewMatrix();
@@ -227,7 +242,7 @@ int main(int argc, char** argv) {
         tex.activeAndBindTexture(GL_TEXTURE0, 0); // la texture earthTexture est bindée sur l'unité GL_TEXTURE0
         glUniform1i(sunProgram.uTexture, 0);
 
-        // Lune avec C3GA
+        // Mercure avec C3GA
         moonProgram.m_Program.use();
         glUniform1i(moonProgram.uTexture, 0);
 
@@ -235,6 +250,7 @@ int main(int argc, char** argv) {
 
         moonMVMatrix = glm::translate(moonMVMatrix, translateLune);
         moonMVMatrix = glm::scale(moonMVMatrix, scaleLune);
+        moonMVMatrix = glm::rotate(moonMVMatrix, windowManager.getTime(), rotateLune);
         
         // Specify the value of a uniform variable for the current program object
         glUniformMatrix4fv(moonProgram.uMVMatrix, 1, GL_FALSE, glm::value_ptr(moonMVMatrix));
@@ -246,6 +262,29 @@ int main(int argc, char** argv) {
         tex.activeAndBindTexture(GL_TEXTURE0, 0); // la texture earthTexture est bindée sur l'unité GL_TEXTURE2
         glUniform1i(moonProgram.uTexture, 0);
 
+
+        // Venus avec C3GA
+        earthProgram.m_Program.use();
+        glUniform1i(earthProgram.uEarthTexture, 0);
+        glUniform1i(earthProgram.uCloudTexture, 1);
+
+        glm::mat4 venusMVMatrix = glm::rotate(globalMVMatrix, windowManager.getTime(), glm::vec3(0, 1, 0)); // Translation * Rotation
+
+        venusMVMatrix = glm::translate(venusMVMatrix, translateVenus);
+        venusMVMatrix = glm::scale(venusMVMatrix, scaleVenus);
+        venusMVMatrix = glm::rotate(venusMVMatrix, windowManager.getTime(), rotateVenus);
+        
+        // Specify the value of a uniform variable for the current program object
+        glUniformMatrix4fv(earthProgram.uMVMatrix, 1, GL_FALSE, glm::value_ptr(venusMVMatrix));
+        glUniformMatrix4fv(earthProgram.uNormalMatrix, 1, GL_FALSE, glm::value_ptr(glm::transpose(glm::inverse(venusMVMatrix))));
+        glUniformMatrix4fv(earthProgram.uMVPMatrix, 1, GL_FALSE, glm::value_ptr(ProjMatrix * venusMVMatrix));
+        tex.activeAndBindTexture(GL_TEXTURE0, texture[3]);
+        tex.activeAndBindTexture(GL_TEXTURE1, texture[2]);
+        glDrawArrays(GL_TRIANGLES, 0, sphere.getVertexCount());
+        glActiveTexture(GL_TEXTURE0);
+        tex.activeAndBindTexture(GL_TEXTURE0, 0); // la texture earthTexture est bindée sur l'unité GL_TEXTURE2
+        tex.activeAndBindTexture(GL_TEXTURE1, 0);
+        glUniform1i(earthProgram.uEarthTexture, 0);
 
 
 
