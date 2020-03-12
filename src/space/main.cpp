@@ -89,7 +89,7 @@ int main(int argc, char** argv) {
     Skytext skytex(applicationPath);
 
     Sphere sphere(1, 32, 16); // rayon = 1, latitude = 32, longitude = 16
-    Tore tore(0.1, 1, 72, 36);
+    Tore tore(0.5, 3, 72, 36); // rayon_interne = 0.1, rayon_externe = 1
 
     Transformation transfo;
     
@@ -120,7 +120,7 @@ int main(int argc, char** argv) {
     };
     //Binding de la texture Spatial
     texSpatial = skybox.loadCubemap(facesGalaxy);
-    float distRendu = 2500.0f;
+    float distRendu = 5000.0f;
     //// Fin SkyBox
 
     // Textures planetes
@@ -164,7 +164,7 @@ int main(int argc, char** argv) {
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
-    glEnable(GL_DEPTH_TEST);
+
     glm::mat4 ProjMatrix = glm::perspective(glm::radians(70.f), 800.f/600.f, 0.1f, 100.f);
 
     glBufferData(GL_ARRAY_BUFFER, sphere.getVertexCount() * sizeof(ShapeVertex), sphere.getDataPointer(), GL_STATIC_DRAW);
@@ -193,7 +193,6 @@ int main(int argc, char** argv) {
     glGenBuffers(1, &vbo_tore);
     glBindBuffer(GL_ARRAY_BUFFER, vbo_tore);
 
-    glEnable(GL_DEPTH_TEST);
 
     glBufferData(GL_ARRAY_BUFFER, tore.getVertexCount() * sizeof(ShapeVertex), tore.getDataPointer(), GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -233,7 +232,7 @@ int main(int argc, char** argv) {
     glm::vec3 rotateGlobal = glm::vec3(0, 1, 0);
     /* Mercure */
         /* Translation */
-        sphere.setSphere(transfo.translate(sphere.getSphere()));
+        sphere.setSphere(transfo.translate(sphere.getSphere(), 4));
         glm::vec3 translateMercure = transfo.applyTranslationX(sphere);
         /* Scale */
         sphere.setSphere(transfo.scale(sphere.getSphere(), 5));
@@ -244,7 +243,7 @@ int main(int argc, char** argv) {
     /* Venus */
         /* Translation */
         //std::cout << sphere.getSphere() << std::endl;
-        sphere.setSphere(transfo.translate(sphere.getSphere(), 0.5));
+        sphere.setSphere(transfo.translate(sphere.getSphere(), 8));
         glm::vec3 translateVenus = transfo.applyTranslationX(sphere);
         //std::cout << sphere.getSphere() << std::endl;
         /* Scale */
@@ -254,7 +253,7 @@ int main(int argc, char** argv) {
     /* Terre */
         /* Translation */
         //std::cout << sphere.getSphere() << std::endl;
-        sphere.setSphere(transfo.translate(sphere.getSphere(), 8.5));
+        sphere.setSphere(transfo.translate(sphere.getSphere(), -1.5));
         glm::vec3 translateEarth = transfo.applyTranslationX(sphere);
         //std::cout << sphere.getSphere() << std::endl;
         /* Scale */
@@ -264,7 +263,7 @@ int main(int argc, char** argv) {
         Sphere earthSphere = sphere;
     /* Mars */
         /* Translation */
-        sphere.setSphere(transfo.translate(sphere.getSphere(), 1));
+        sphere.setSphere(transfo.translate(sphere.getSphere(), -2));
         glm::vec3 translateMars = transfo.applyTranslationX(sphere);
         /* Scale */
         glm::vec3 scaleMars = scaleMercure;
@@ -272,20 +271,21 @@ int main(int argc, char** argv) {
         glm::vec3 rotateMars = rotateMercure;
     /* Jupiter */
         /* Translation */
-        sphere.setSphere(transfo.translate(sphere.getSphere(), 1.5));
+        sphere.setSphere(transfo.translate(sphere.getSphere(), -3));
         glm::vec3 translateJupiter = transfo.applyTranslationX(sphere);
         /* Scale */
-        sphere.setSphere(transfo.scale(sphere.getSphere(), 0.5));
+        sphere.setSphere(transfo.scale(sphere.getSphere(), 0.3));
         glm::vec3 scaleJupiter = transfo.applyScale(sphere);
         /* Rotation */
         glm::vec3 rotateJupiter = rotateMercure;
         Sphere jupiterSphere = sphere;
     /* Saturne */
         /* Translation */
-        sphere.setSphere(transfo.translate(sphere.getSphere(), 1));
+        sphere.setSphere(transfo.translate(sphere.getSphere(), -6));
         glm::vec3 translateSaturne = transfo.applyTranslationX(sphere);
         /* Scale */
-        glm::vec3 scaleSaturne = scaleMercure;
+        sphere.setSphere(transfo.scale(sphere.getSphere(), 1.5));
+        glm::vec3 scaleSaturne = transfo.applyScale(sphere);
         /* Rotation */
         glm::vec3 rotateSaturne = rotateMercure;
     /* Uranus */
@@ -306,7 +306,7 @@ int main(int argc, char** argv) {
         glm::vec3 rotateNeptune = rotateMercure;
     /* Lune */
         /* Translation */
-        earthSphere.setSphere(transfo.translate(earthSphere.getSphere(), -1.7));
+        earthSphere.setSphere(transfo.translate(earthSphere.getSphere(), 7));
         glm::vec3 translateLune = transfo.applyTranslationX(earthSphere);
         /* Scale */
         earthSphere.setSphere(transfo.scale(earthSphere.getSphere(), 1.2));
@@ -315,7 +315,7 @@ int main(int argc, char** argv) {
         glm::vec3 rotateLune = rotateMercure;
     /* Callisto */
         /* Translation */
-        jupiterSphere.setSphere(transfo.translate(jupiterSphere.getSphere(), -1.7));
+        jupiterSphere.setSphere(transfo.translate(jupiterSphere.getSphere(), 5));
         glm::vec3 translateCallisto = transfo.applyTranslationX(jupiterSphere);
         /* Scale */
         jupiterSphere.setSphere(transfo.scale(jupiterSphere.getSphere(), 5));
@@ -332,13 +332,13 @@ int main(int argc, char** argv) {
             if (e.type == SDL_QUIT || windowManager.isKeyPressed(SDLK_ESCAPE)) {
                 done = true; // Leave the loop after this iteration
             }
-            if (e.type == SDL_VIDEORESIZE) {
-                width_windows = e.resize.w;
-                height_windows = e.resize.h;
-                glViewport(0, 0, (GLsizei) width_windows, (GLsizei) height_windows);
-                ratio_h_w = (float)width_windows / (float)height_windows;
-                ProjMatrix = glm::perspective(glm::radians(70.f), ratio_h_w, 0.1f, distRendu);
-            }
+            // if (e.type == SDL_VIDEORESIZE) {
+            //     width_windows = e.resize.w;
+            //     height_windows = e.resize.h;
+            //     glViewport(0, 0, (GLsizei) width_windows, (GLsizei) height_windows);
+            //     ratio_h_w = (float)width_windows / (float)height_windows;
+            //     ProjMatrix = glm::perspective(glm::radians(70.f), ratio_h_w, 0.1f, distRendu);
+            // }
         }
 
         // Gestion de la camera
@@ -383,6 +383,7 @@ int main(int argc, char** argv) {
         sunProgram.m_Program.use();
         glUniform1i(sunProgram.uTexture, 0);
         glm::mat4 sunMVMatrix = glm::rotate(globalMVMatrix, windowManager.getTime(), rotateGlobal);
+        sunMVMatrix = glm::scale(sunMVMatrix, glm::vec3(5, 5, 5));
         // Specify the value of a uniform variable for the current program object
         glUniformMatrix4fv(sunProgram.uMVMatrix, 1, GL_FALSE, glm::value_ptr(sunMVMatrix));
         glUniformMatrix4fv(sunProgram.uNormalMatrix, 1, GL_FALSE, glm::value_ptr(glm::transpose(glm::inverse(sunMVMatrix))));
@@ -394,21 +395,22 @@ int main(int argc, char** argv) {
         glUniform1i(sunProgram.uTexture, 0);
 
         drawPlanet(sphere, mercureProgram, tex, texture[4], windowManager,
-            globalMVMatrix, ProjMatrix, rotateGlobal, translateMercure, scaleMercure, rotateMercure, 1);
+            globalMVMatrix, ProjMatrix, rotateGlobal, translateMercure, scaleMercure, rotateMercure, 0.6);
+
 
         drawPlanet(sphere, venusProgram, tex, texture[5], windowManager,
-            globalMVMatrix, ProjMatrix, rotateGlobal, translateVenus, scaleVenus, rotateVenus, 2);
-
+            globalMVMatrix, ProjMatrix, rotateGlobal, translateVenus, scaleVenus, rotateVenus, 0.8);
 
         // Terre avec C3GA
         glm::mat4 earthMVMatrix = drawPlanet(sphere, earthProgram, tex, texture[3], windowManager,
             globalMVMatrix, ProjMatrix, rotateGlobal, translateEarth, scaleEarth, rotateEarth, 1);
 
+
         drawPlanet(sphere, marsProgram, tex, texture[6], windowManager,
-            globalMVMatrix, ProjMatrix, rotateGlobal, translateMars, scaleMars, rotateMars, 0.2);
+            globalMVMatrix, ProjMatrix, rotateGlobal, translateMars, scaleMars, rotateMars, 1.2);
 
         glm::mat4 jupiterMVMatrix = drawPlanet(sphere, jupiterProgram, tex, texture[7], windowManager,
-            globalMVMatrix, ProjMatrix, rotateGlobal, translateJupiter, scaleJupiter, rotateJupiter, 1);
+            globalMVMatrix, ProjMatrix, rotateGlobal, translateJupiter, scaleJupiter, rotateJupiter, 1.4);
 
         drawPlanet(sphere, saturneProgram, tex, texture[8], windowManager,
             globalMVMatrix, ProjMatrix, rotateGlobal, translateSaturne, scaleSaturne, rotateSaturne, 0.5);
@@ -416,8 +418,11 @@ int main(int argc, char** argv) {
         drawPlanet(sphere, uranusProgram, tex, texture[9], windowManager,
             globalMVMatrix, ProjMatrix, rotateGlobal, translateUranus, scaleUranus, rotateUranus, 1);
 
-        drawPlanet(sphere, neptuneProgram, tex, texture[10], windowManager,
+        /*drawPlanet(sphere, neptuneProgram, tex, texture[10], windowManager,
             globalMVMatrix, ProjMatrix, rotateGlobal, translateNeptune, scaleNeptune, rotateNeptune, 1.5);
+
+            */
+
 
         // Lune avec c3ga
         moonProgram.m_Program.use();
@@ -440,7 +445,7 @@ int main(int argc, char** argv) {
         // Callisto avec c3ga
         callistoProgram.m_Program.use();
         glUniform1i(callistoProgram.uTexture, 0);
-        glm::mat4 callistoMVMatrix = glm::rotate(jupiterMVMatrix, windowManager.getTime()*1, translateJupiter);
+        glm::mat4 callistoMVMatrix = glm::rotate(jupiterMVMatrix, windowManager.getTime()*1.4f, translateJupiter);
 
         callistoMVMatrix = glm::translate(callistoMVMatrix, translateCallisto);
         callistoMVMatrix = glm::scale(callistoMVMatrix, scaleCallisto);
@@ -455,8 +460,6 @@ int main(int argc, char** argv) {
         tex.activeAndBindTexture(GL_TEXTURE0, 0); // la texture earthTexture est bindée sur l'unité GL_TEXTURE2
         glUniform1i(callistoProgram.uTexture, 0);
 
-
-        glBindVertexArray(0);
 
         // Tore
         glBindVertexArray(vao_tore);
@@ -473,6 +476,7 @@ int main(int argc, char** argv) {
             glUniformMatrix4fv(saturneProgram.uNormalMatrix, 1, GL_FALSE, glm::value_ptr(glm::transpose(glm::inverse(toreMVMatrix))));
             glDrawArrays(GL_TRIANGLES, 0, tore.getVertexCount());
 
+    
         glBindVertexArray(0);
 
         // Update the display
