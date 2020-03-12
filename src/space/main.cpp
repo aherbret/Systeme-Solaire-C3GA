@@ -85,6 +85,7 @@ int main(int argc, char** argv) {
     TexProgram saturneProgram(applicationPath);
     TexProgram uranusProgram(applicationPath);
     TexProgram neptuneProgram(applicationPath);
+    TexProgram callistoProgram(applicationPath);
     Skytext skytex(applicationPath);
 
     Sphere sphere(1, 32, 16); // rayon = 1, latitude = 32, longitude = 16
@@ -135,15 +136,16 @@ int main(int argc, char** argv) {
     std::unique_ptr<Image> SaturneMap = loadImage("../assets/textures/Saturne.jpg");
     std::unique_ptr<Image> UranusMap = loadImage("../assets/textures/Uranus.jpg");
     std::unique_ptr<Image> NeptuneMap = loadImage("../assets/textures/Neptune.jpg");
+    std::unique_ptr<Image> CallistoMap = loadImage("../assets/textures/Callisto.jpg");
 
     if (SunMap == NULL || MoonMap == NULL || CloudMap == NULL || EarthMap == NULL
         || MercureMap == NULL || VenusMap == NULL || MarsMap == NULL || JupiterMap == NULL
-        || SaturneMap == NULL || UranusMap == NULL || NeptuneMap == NULL) {
+        || SaturneMap == NULL || UranusMap == NULL || NeptuneMap == NULL || CallistoMap == NULL) {
         std::cerr << "Une des textures n'a pas pu etre chargée. \n" << std::endl;
         exit(0);
     }
-    GLuint texture[11];
-    glGenTextures(10, texture);
+    GLuint texture[12];
+    glGenTextures(11, texture);
     tex.firstBindTexture(SunMap, texture[0]); //Binding de la texture SunMap
     tex.firstBindTexture(MoonMap, texture[1]); //Binding de la texture MoonMap
     tex.firstBindTexture(CloudMap, texture[2]); //Binding de la texture CloudMap
@@ -155,6 +157,7 @@ int main(int argc, char** argv) {
     tex.firstBindTexture(SaturneMap, texture[8]); //Binding de la texture SaturneMap
     tex.firstBindTexture(UranusMap, texture[9]); //Binding de la texture UranusMap
     tex.firstBindTexture(NeptuneMap, texture[10]); //Binding de la texture NeptuneMap
+    tex.firstBindTexture(CallistoMap, texture[11]); //Binding de la texture CallistoMap
     //// Fin Textures planetes
 
     GLuint vbo;
@@ -276,6 +279,7 @@ int main(int argc, char** argv) {
         glm::vec3 scaleJupiter = transfo.applyScale(sphere);
         /* Rotation */
         glm::vec3 rotateJupiter = rotateMercure;
+        Sphere jupiterSphere = sphere;
     /* Saturne */
         /* Translation */
         sphere.setSphere(transfo.translate(sphere.getSphere(), 1));
@@ -309,6 +313,15 @@ int main(int argc, char** argv) {
         glm::vec3 scaleLune = transfo.applyScale(earthSphere);
         /* Rotation */
         glm::vec3 rotateLune = rotateMercure;
+    /* Callisto */
+        /* Translation */
+        jupiterSphere.setSphere(transfo.translate(jupiterSphere.getSphere(), -1.7));
+        glm::vec3 translateCallisto = transfo.applyTranslationX(jupiterSphere);
+        /* Scale */
+        jupiterSphere.setSphere(transfo.scale(jupiterSphere.getSphere(), 5));
+        glm::vec3 scaleCallisto = transfo.applyScale(jupiterSphere);
+        /* Rotation */
+        glm::vec3 rotateCallisto = rotateMercure;
 
 
     while (!done) {
@@ -394,7 +407,7 @@ int main(int argc, char** argv) {
         drawPlanet(sphere, marsProgram, tex, texture[6], windowManager,
             globalMVMatrix, ProjMatrix, rotateGlobal, translateMars, scaleMars, rotateMars, 0.2);
 
-        drawPlanet(sphere, jupiterProgram, tex, texture[7], windowManager,
+        glm::mat4 jupiterMVMatrix = drawPlanet(sphere, jupiterProgram, tex, texture[7], windowManager,
             globalMVMatrix, ProjMatrix, rotateGlobal, translateJupiter, scaleJupiter, rotateJupiter, 1);
 
         drawPlanet(sphere, saturneProgram, tex, texture[8], windowManager,
@@ -424,32 +437,28 @@ int main(int argc, char** argv) {
         tex.activeAndBindTexture(GL_TEXTURE0, 0); // la texture earthTexture est bindée sur l'unité GL_TEXTURE2
         glUniform1i(moonProgram.uTexture, 0);
 
-        glBindVertexArray(0);
+        // Callisto avec c3ga
+        callistoProgram.m_Program.use();
+        glUniform1i(callistoProgram.uTexture, 0);
+        glm::mat4 callistoMVMatrix = glm::rotate(jupiterMVMatrix, windowManager.getTime()*1, translateJupiter);
 
-        /*
-        // Tore avec C3GA
-        glBindVertexArray(vao_tore);
-        venusProgram.m_Program.use();
-        glUniform1i(venusProgram.uTexture, 0);
-
-        glm::mat4 toreMVMatrix = glm::rotate(globalMVMatrix, windowManager.getTime(), glm::vec3(0, 1, 0)); // Translation * Rotation
-
-        toreMVMatrix = glm::rotate(toreMVMatrix, windowManager.getTime(), glm::vec3(0, 1, 0));
-        
+        callistoMVMatrix = glm::translate(callistoMVMatrix, translateCallisto);
+        callistoMVMatrix = glm::scale(callistoMVMatrix, scaleCallisto);
+        callistoMVMatrix = glm::rotate(callistoMVMatrix, windowManager.getTime(), rotateCallisto);
         // Specify the value of a uniform variable for the current program object
-        glUniformMatrix4fv(venusProgram.uMVMatrix, 1, GL_FALSE, glm::value_ptr(toreMVMatrix));
-        glUniformMatrix4fv(venusProgram.uNormalMatrix, 1, GL_FALSE, glm::value_ptr(glm::transpose(glm::inverse(toreMVMatrix))));
-        glUniformMatrix4fv(venusProgram.uMVPMatrix, 1, GL_FALSE, glm::value_ptr(ProjMatrix * toreMVMatrix));
-        tex.activeAndBindTexture(GL_TEXTURE0, texture[5]);
-        glDrawArrays(GL_TRIANGLES, 0, tore.getVertexCount());
+        glUniformMatrix4fv(callistoProgram.uMVMatrix, 1, GL_FALSE, glm::value_ptr(callistoMVMatrix));
+        glUniformMatrix4fv(callistoProgram.uNormalMatrix, 1, GL_FALSE, glm::value_ptr(glm::transpose(glm::inverse(callistoMVMatrix))));
+        glUniformMatrix4fv(callistoProgram.uMVPMatrix, 1, GL_FALSE, glm::value_ptr(ProjMatrix * callistoMVMatrix));
+        tex.activeAndBindTexture(GL_TEXTURE0, texture[11]);
+        glDrawArrays(GL_TRIANGLES, 0, earthSphere.getVertexCount());
         glActiveTexture(GL_TEXTURE0);
         tex.activeAndBindTexture(GL_TEXTURE0, 0); // la texture earthTexture est bindée sur l'unité GL_TEXTURE2
-        glUniform1i(venusProgram.uTexture, 0);
+        glUniform1i(callistoProgram.uTexture, 0);
+
 
         glBindVertexArray(0);
-        tex.activeAndBindTexture(GL_TEXTURE0, 0); // la texture moonTexture est bindée sur l'unité GL_TEXTURE0
-        */
 
+        // Tore
         glBindVertexArray(vao_tore);
 
         saturneProgram.m_Program.use();
@@ -457,7 +466,7 @@ int main(int argc, char** argv) {
             toreMVMatrix = glm::translate(toreMVMatrix, translateSaturne - glm::vec3(0, 2, -0.2));
             toreMVMatrix = glm::rotate(toreMVMatrix, 80.0f, glm::vec3(1,0,0));
             glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, texture[5]);
+            glBindTexture(GL_TEXTURE_2D, texture[1]);
             glUniform1i(saturneProgram.uTexture, 0);
             glUniformMatrix4fv(saturneProgram.uMVMatrix, 1, GL_FALSE, glm::value_ptr(toreMVMatrix));
             glUniformMatrix4fv(saturneProgram.uMVPMatrix, 1, GL_FALSE, glm::value_ptr(ProjMatrix * toreMVMatrix));
