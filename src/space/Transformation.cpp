@@ -10,7 +10,7 @@
 c3ga::Mvec<double> Transformation::translate(c3ga::Mvec<double> vect, double facteur, c3ga::Mvec<double> translation) {
 	//c3ga::Mvec<double> translation = c3ga::e1<double>();
     //double facteur = 1;
-    c3ga::Mvec<double> translator = 1 - 0.5 * translation * c3ga::ei<double>() * facteur;    
+    c3ga::Mvec<double> translator = 1 - 0.5 * translation * c3ga::ei<double>() * facteur;
 	vect = translator * vect * translator.inv();
 	return vect;
 }
