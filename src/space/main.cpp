@@ -191,7 +191,6 @@ int main(int argc, char** argv) {
     glBindBuffer(GL_ARRAY_BUFFER, vbo_tore);
 
     glEnable(GL_DEPTH_TEST);
-    glm::mat4 ProjMatrixTore = glm::perspective(glm::radians(70.f), 800.f/600.f, 0.1f, 100.f);
 
     glBufferData(GL_ARRAY_BUFFER, tore.getVertexCount() * sizeof(ShapeVertex), tore.getDataPointer(), GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -433,29 +432,46 @@ int main(int argc, char** argv) {
         venusProgram.m_Program.use();
         glUniform1i(venusProgram.uTexture, 0);
 
-        venusMVMatrix = glm::rotate(globalMVMatrix, windowManager.getTime(), glm::vec3(0, 1, 0)); // Translation * Rotation
+        glm::mat4 toreMVMatrix = glm::rotate(globalMVMatrix, windowManager.getTime(), glm::vec3(0, 1, 0)); // Translation * Rotation
 
-        venusMVMatrix = glm::rotate(venusMVMatrix, windowManager.getTime(), glm::vec3(0, 1, 0));
+        toreMVMatrix = glm::rotate(toreMVMatrix, windowManager.getTime(), glm::vec3(0, 1, 0));
         
         // Specify the value of a uniform variable for the current program object
-        glUniformMatrix4fv(venusProgram.uMVMatrix, 1, GL_FALSE, glm::value_ptr(venusMVMatrix));
-        glUniformMatrix4fv(venusProgram.uNormalMatrix, 1, GL_FALSE, glm::value_ptr(glm::transpose(glm::inverse(venusMVMatrix))));
-        glUniformMatrix4fv(venusProgram.uMVPMatrix, 1, GL_FALSE, glm::value_ptr(ProjMatrix * venusMVMatrix));
+        glUniformMatrix4fv(venusProgram.uMVMatrix, 1, GL_FALSE, glm::value_ptr(toreMVMatrix));
+        glUniformMatrix4fv(venusProgram.uNormalMatrix, 1, GL_FALSE, glm::value_ptr(glm::transpose(glm::inverse(toreMVMatrix))));
+        glUniformMatrix4fv(venusProgram.uMVPMatrix, 1, GL_FALSE, glm::value_ptr(ProjMatrix * toreMVMatrix));
         tex.activeAndBindTexture(GL_TEXTURE0, texture[5]);
         glDrawArrays(GL_TRIANGLES, 0, tore.getVertexCount());
         glActiveTexture(GL_TEXTURE0);
         tex.activeAndBindTexture(GL_TEXTURE0, 0); // la texture earthTexture est bindée sur l'unité GL_TEXTURE2
         glUniform1i(venusProgram.uTexture, 0);
 
-
         glBindVertexArray(0);
         tex.activeAndBindTexture(GL_TEXTURE0, 0); // la texture moonTexture est bindée sur l'unité GL_TEXTURE0
         */
+
+        glBindVertexArray(vao_tore);
+
+        saturneProgram.m_Program.use();
+            glm::mat4 toreMVMatrix = glm::rotate(globalMVMatrix, windowManager.getTime() * 0.5f, glm::vec3(0, 1, 0)); // Translation * Rotation
+            toreMVMatrix = glm::translate(toreMVMatrix, translateSaturne - glm::vec3( -0.3,2,0.5));
+            toreMVMatrix = glm::rotate(toreMVMatrix, 80.0f, glm::vec3(1,0,0));
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, texture[5]);
+            glUniform1i(saturneProgram.uTexture, 0);
+            glUniformMatrix4fv(saturneProgram.uMVMatrix, 1, GL_FALSE, glm::value_ptr(toreMVMatrix));
+            glUniformMatrix4fv(saturneProgram.uMVPMatrix, 1, GL_FALSE, glm::value_ptr(ProjMatrix * toreMVMatrix));
+            glUniformMatrix4fv(saturneProgram.uNormalMatrix, 1, GL_FALSE, glm::value_ptr(glm::transpose(glm::inverse(toreMVMatrix))));
+            glDrawArrays(GL_TRIANGLES, 0, tore.getVertexCount());
+
+        glBindVertexArray(0);
 
         // Update the display
         windowManager.swapBuffers();
     }
 
+    glDeleteBuffers(1, &vbo_tore);
+    glDeleteVertexArrays(1, &vao_tore);
     glDeleteBuffers(1, &vbo);
     glDeleteVertexArrays(1, &vao);
 
