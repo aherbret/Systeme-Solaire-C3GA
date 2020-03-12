@@ -91,17 +91,6 @@ int main(int argc, char** argv) {
     Tore tore(0.1, 1, 72, 36);
 
     Transformation transfo;
-    // std::cout << sphere.getSphere() << std::endl;
-    // //transfo.scale(sphere, 15);
-    // sphere.setSphere(transfo.scale2(sphere.getSphere(), 5));
-    // //transfo.applyScale(sphere);
-    // //sphere.setSphere(transfo.translate2(sphere.getSphere()));
-    // std::cout << sphere.getSphere() << std::endl;
-
-    // std::cout << transfo.applyScale(sphere) << std::endl;
-    // glm::vec3 scalescale = transfo.applyScale(sphere);
-
-    //exit(EXIT_FAILURE);
     
     // SkyBox
     float size_cube = 1;
@@ -392,51 +381,6 @@ int main(int argc, char** argv) {
         tex.activeAndBindTexture(GL_TEXTURE0, 0); // la texture earthTexture est bindée sur l'unité GL_TEXTURE0
         glUniform1i(sunProgram.uTexture, 0);
 
-        /*
-        // Mercure avec C3GA
-        mercureProgram.m_Program.use();
-        glUniform1i(mercureProgram.uTexture, 0);
-
-        glm::mat4 mercureMVMatrix = glm::rotate(globalMVMatrix, windowManager.getTime(), glm::vec3(0, 1, 0)); // Translation * Rotation
-
-        mercureMVMatrix = glm::translate(mercureMVMatrix, translateMercure);
-        mercureMVMatrix = glm::scale(mercureMVMatrix, scaleMercure);
-        mercureMVMatrix = glm::rotate(mercureMVMatrix, windowManager.getTime(), rotateMercure);
-        
-        // Specify the value of a uniform variable for the current program object
-        glUniformMatrix4fv(mercureProgram.uMVMatrix, 1, GL_FALSE, glm::value_ptr(mercureMVMatrix));
-        glUniformMatrix4fv(mercureProgram.uNormalMatrix, 1, GL_FALSE, glm::value_ptr(glm::transpose(glm::inverse(mercureMVMatrix))));
-        glUniformMatrix4fv(mercureProgram.uMVPMatrix, 1, GL_FALSE, glm::value_ptr(ProjMatrix * mercureMVMatrix));
-		tex.activeAndBindTexture(GL_TEXTURE0, texture[4]);
-        glDrawArrays(GL_TRIANGLES, 0, sphere.getVertexCount());
-        glActiveTexture(GL_TEXTURE0);
-        tex.activeAndBindTexture(GL_TEXTURE0, 0); // la texture earthTexture est bindée sur l'unité GL_TEXTURE2
-        glUniform1i(mercureProgram.uTexture, 0);
-
-
-        // Venus avec C3GA
-        venusProgram.m_Program.use();
-        glUniform1i(venusProgram.uTexture, 0);
-
-        glm::mat4 venusMVMatrix = glm::rotate(globalMVMatrix, windowManager.getTime(), glm::vec3(0, 1, 0)); // Translation * Rotation
-
-        venusMVMatrix = glm::translate(venusMVMatrix, translateVenus);
-        venusMVMatrix = glm::scale(venusMVMatrix, scaleVenus);
-        venusMVMatrix = glm::rotate(venusMVMatrix, windowManager.getTime(), rotateVenus);
-        
-        // Specify the value of a uniform variable for the current program object
-        glUniformMatrix4fv(venusProgram.uMVMatrix, 1, GL_FALSE, glm::value_ptr(venusMVMatrix));
-        glUniformMatrix4fv(venusProgram.uNormalMatrix, 1, GL_FALSE, glm::value_ptr(glm::transpose(glm::inverse(venusMVMatrix))));
-        glUniformMatrix4fv(venusProgram.uMVPMatrix, 1, GL_FALSE, glm::value_ptr(ProjMatrix * venusMVMatrix));
-        tex.activeAndBindTexture(GL_TEXTURE0, texture[5]);
-        glDrawArrays(GL_TRIANGLES, 0, sphere.getVertexCount());
-        glActiveTexture(GL_TEXTURE0);
-        tex.activeAndBindTexture(GL_TEXTURE0, 0); // la texture earthTexture est bindée sur l'unité GL_TEXTURE2
-        glUniform1i(venusProgram.uTexture, 0);
-
-        glBindVertexArray(0);
-        */
-
         drawPlanet(sphere, mercureProgram, tex, texture[4], windowManager,
             globalMVMatrix, ProjMatrix, rotateGlobal, translateMercure, scaleMercure, rotateMercure, 1);
 
@@ -447,26 +391,6 @@ int main(int argc, char** argv) {
         // Terre avec C3GA
         glm::mat4 earthMVMatrix = drawPlanet(sphere, earthProgram, tex, texture[3], windowManager,
             globalMVMatrix, ProjMatrix, rotateGlobal, translateEarth, scaleEarth, rotateEarth, 1);
-        // earthProgram.m_Program.use();
-        // glUniform1i(earthProgram.uEarthTexture, 0);
-        // glUniform1i(earthProgram.uCloudTexture, 1);
-
-        // glm::mat4 earthMVMatrix = glm::rotate(globalMVMatrix, windowManager.getTime(), rotateGlobal); // Translation * Rotation
-
-        // earthMVMatrix = glm::translate(earthMVMatrix, translateEarth);
-        // earthMVMatrix = glm::scale(earthMVMatrix, scaleEarth);
-        // earthMVMatrix = glm::rotate(earthMVMatrix, windowManager.getTime(), rotateEarth);
-        
-        // // Specify the value of a uniform variable for the current program object
-        // glUniformMatrix4fv(earthProgram.uMVMatrix, 1, GL_FALSE, glm::value_ptr(earthMVMatrix));
-        // glUniformMatrix4fv(earthProgram.uNormalMatrix, 1, GL_FALSE, glm::value_ptr(glm::transpose(glm::inverse(earthMVMatrix))));
-        // glUniformMatrix4fv(earthProgram.uMVPMatrix, 1, GL_FALSE, glm::value_ptr(ProjMatrix * earthMVMatrix));
-        // tex.activeAndBindTexture(GL_TEXTURE0, texture[3]);
-        // tex.activeAndBindTexture(GL_TEXTURE1, texture[2]);
-        // glDrawArrays(GL_TRIANGLES, 0, sphere.getVertexCount());
-        // tex.activeAndBindTexture(GL_TEXTURE0, 0);
-        // tex.activeAndBindTexture(GL_TEXTURE1, 0);
-        // //glUniform1i(earthProgram.uEarthTexture, 0);
 
         drawPlanet(sphere, marsProgram, tex, texture[6], windowManager,
             globalMVMatrix, ProjMatrix, rotateGlobal, translateMars, scaleMars, rotateMars, 0.2);
@@ -482,9 +406,6 @@ int main(int argc, char** argv) {
 
         drawPlanet(sphere, neptuneProgram, tex, texture[10], windowManager,
             globalMVMatrix, ProjMatrix, rotateGlobal, translateNeptune, scaleNeptune, rotateNeptune, 1.5);
-
-        // drawPlanet(sphere, moonProgram, tex, texture[1], windowManager,
-        //    globalMVMatrix, ProjMatrix, rotateGlobal, translateLune, scaleLune, rotateLune, 1.5);
 
         // Lune avec c3ga
         moonProgram.m_Program.use();
