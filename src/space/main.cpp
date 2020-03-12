@@ -30,12 +30,12 @@ const GLuint VERTEX_ATTR_TEXCOORD = 2;
 
 
 void drawPlanet(Sphere & sphere, TexProgram & program, Texture & tex, GLuint tex_planet, SDLWindowManager & windowManager, glm::mat4 & globalMVMatrix, glm::mat4 & ProjMatrix, glm::vec3 & rotateGlobal,
-    glm::vec3 & translate, glm::vec3 & scale, glm::vec3 & rotate) {
+    glm::vec3 & translate, glm::vec3 & scale, glm::vec3 & rotate, float speed) {
     program.m_Program.use();
     glUniform1i(program.uTexture, 0);
 
     //glm::mat4 MVMatrix = glm::rotate(globalMVMatrix, windowManager.getTime(), glm::vec3(0, 1, 0)); // Translation * Rotation
-    glm::mat4 MVMatrix = glm::rotate(globalMVMatrix, windowManager.getTime(), rotateGlobal);
+    glm::mat4 MVMatrix = glm::rotate(globalMVMatrix, windowManager.getTime()*speed, rotateGlobal);
 
     MVMatrix = glm::translate(MVMatrix, translate);
     MVMatrix = glm::scale(MVMatrix, scale);
@@ -278,10 +278,11 @@ int main(int argc, char** argv) {
         glm::vec3 rotateMars = rotateMercure;
     /* Jupiter */
         /* Translation */
-        sphere.setSphere(transfo.translate(sphere.getSphere(), 1));
+        sphere.setSphere(transfo.translate(sphere.getSphere(), 1.5));
         glm::vec3 translateJupiter = transfo.applyTranslationX(sphere);
         /* Scale */
-        glm::vec3 scaleJupiter = scaleMercure;
+        sphere.setSphere(transfo.scale(sphere.getSphere(), 0.5));
+        glm::vec3 scaleJupiter = transfo.applyScale(sphere);
         /* Rotation */
         glm::vec3 rotateJupiter = rotateMercure;
     /* Saturne */
@@ -294,7 +295,7 @@ int main(int argc, char** argv) {
         glm::vec3 rotateSaturne = rotateMercure;
     /* Uranus */
         /* Translation */
-        sphere.setSphere(transfo.translate(sphere.getSphere(), 1));
+        sphere.setSphere(transfo.translate(sphere.getSphere(), 1.5));
         glm::vec3 translateUranus = transfo.applyTranslationX(sphere);
         /* Scale */
         glm::vec3 scaleUranus = scaleMercure;
@@ -425,15 +426,15 @@ int main(int argc, char** argv) {
         */
 
         drawPlanet(sphere, mercureProgram, tex, texture[4], windowManager,
-            globalMVMatrix, ProjMatrix, rotateGlobal, translateMercure, scaleMercure, rotateMercure);
+            globalMVMatrix, ProjMatrix, rotateGlobal, translateMercure, scaleMercure, rotateMercure, 1);
 
         drawPlanet(sphere, venusProgram, tex, texture[5], windowManager,
-            globalMVMatrix, ProjMatrix, rotateGlobal, translateVenus, scaleVenus, rotateVenus);
+            globalMVMatrix, ProjMatrix, rotateGlobal, translateVenus, scaleVenus, rotateVenus, 2);
 
 
         // Terre avec C3GA
         drawPlanet(sphere, earthProgram, tex, texture[3], windowManager,
-            globalMVMatrix, ProjMatrix, rotateGlobal, translateEarth, scaleEarth, rotateEarth);
+            globalMVMatrix, ProjMatrix, rotateGlobal, translateEarth, scaleEarth, rotateEarth, 1);
         // earthProgram.m_Program.use();
         // glUniform1i(earthProgram.uEarthTexture, 0);
         // glUniform1i(earthProgram.uCloudTexture, 1);
@@ -456,19 +457,19 @@ int main(int argc, char** argv) {
         // //glUniform1i(earthProgram.uEarthTexture, 0);
 
         drawPlanet(sphere, marsProgram, tex, texture[6], windowManager,
-            globalMVMatrix, ProjMatrix, rotateGlobal, translateMars, scaleMars, rotateMars);
+            globalMVMatrix, ProjMatrix, rotateGlobal, translateMars, scaleMars, rotateMars, 0.2);
 
         drawPlanet(sphere, jupiterProgram, tex, texture[7], windowManager,
-            globalMVMatrix, ProjMatrix, rotateGlobal, translateJupiter, scaleJupiter, rotateJupiter);
+            globalMVMatrix, ProjMatrix, rotateGlobal, translateJupiter, scaleJupiter, rotateJupiter, 1);
 
         drawPlanet(sphere, saturneProgram, tex, texture[8], windowManager,
-            globalMVMatrix, ProjMatrix, rotateGlobal, translateSaturne, scaleSaturne, rotateSaturne);
+            globalMVMatrix, ProjMatrix, rotateGlobal, translateSaturne, scaleSaturne, rotateSaturne, 0.5);
 
         drawPlanet(sphere, uranusProgram, tex, texture[9], windowManager,
-            globalMVMatrix, ProjMatrix, rotateGlobal, translateUranus, scaleUranus, rotateUranus);
+            globalMVMatrix, ProjMatrix, rotateGlobal, translateUranus, scaleUranus, rotateUranus, 1);
 
         drawPlanet(sphere, neptuneProgram, tex, texture[10], windowManager,
-            globalMVMatrix, ProjMatrix, rotateGlobal, translateNeptune, scaleNeptune, rotateNeptune);
+            globalMVMatrix, ProjMatrix, rotateGlobal, translateNeptune, scaleNeptune, rotateNeptune, 1.5);
 
         glBindVertexArray(0);
 
