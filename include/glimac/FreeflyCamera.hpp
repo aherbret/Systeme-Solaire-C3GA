@@ -8,7 +8,7 @@ class FreeflyCamera {
     public:
 
         virtual  ~FreeflyCamera(){};
-        FreeflyCamera(): m_Position(0, 0, 12), m_fPhi(M_PI - 0.02 * M_PI), m_fTheta(0.0f) {
+        FreeflyCamera(): m_Position(2.436,   94.098,   -7.511), m_fPhi(0), m_fTheta(-M_PI_2) {
             computeDirectionVectors();
 
         };

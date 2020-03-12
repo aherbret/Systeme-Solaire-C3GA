@@ -54,6 +54,55 @@ glm::mat4 drawPlanet(Sphere & sphere, TexProgram & program, Texture & tex, GLuin
     return MVMatrix;
 }
 
+Tore initTore(float ri, float re, GLuint & vbo_tore, GLuint & vao_tore) {
+    // Trajectoire
+    Tore tore(ri, re, 72, 36);
+
+    glGenBuffers(1, &vbo_tore);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo_tore);
+
+
+    glBufferData(GL_ARRAY_BUFFER, tore.getVertexCount() * sizeof(ShapeVertex), tore.getDataPointer(), GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    glGenVertexArrays(1, &vao_tore);
+    glBindVertexArray(vao_tore);
+    
+    glEnableVertexAttribArray(VERTEX_ATTR_POSITION);
+    glEnableVertexAttribArray(VERTEX_ATTR_NORMAL);
+    glEnableVertexAttribArray(VERTEX_ATTR_TEXCOORD);
+
+    glBindBuffer(GL_ARRAY_BUFFER, vbo_tore);
+
+    glVertexAttribPointer(VERTEX_ATTR_POSITION, 3, GL_FLOAT, GL_FALSE,  sizeof(ShapeVertex), (const GLvoid *)(offsetof(ShapeVertex, position)));
+    glVertexAttribPointer(VERTEX_ATTR_NORMAL, 3, GL_FLOAT, GL_FALSE,  sizeof(ShapeVertex), (const GLvoid *)(offsetof(ShapeVertex, normal)));
+    glVertexAttribPointer(VERTEX_ATTR_TEXCOORD, 2, GL_FLOAT, GL_FALSE,  sizeof(ShapeVertex), (const GLvoid *)(offsetof(ShapeVertex, texCoords)));
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+
+    return tore;
+}
+
+void drawTore(Tore & tore, GLuint & vao_tore, TexProgram & saturneProgram, glm::mat4 & globalMVMatrix,
+    SDLWindowManager & windowManager, GLuint texture, glm::mat4 & ProjMatrix, glm::vec3 & translateSaturne) {
+
+    glBindVertexArray(vao_tore);
+
+    saturneProgram.m_Program.use();
+    glm::mat4 toreMVMatrix = glm::rotate(globalMVMatrix, windowManager.getTime() * 0.5f, glm::vec3(0, 1, 0)); // Translation * Rotation
+    //toreMVMatrix = glm::translate(toreMVMatrix, translateSaturne - glm::vec3(0, 2, -0.2));
+    toreMVMatrix = glm::rotate(toreMVMatrix, 80.0f, glm::vec3(1,0,0));
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glUniform1i(saturneProgram.uTexture, 0);
+    glUniformMatrix4fv(saturneProgram.uMVMatrix, 1, GL_FALSE, glm::value_ptr(toreMVMatrix));
+    glUniformMatrix4fv(saturneProgram.uMVPMatrix, 1, GL_FALSE, glm::value_ptr(ProjMatrix * toreMVMatrix));
+    glUniformMatrix4fv(saturneProgram.uNormalMatrix, 1, GL_FALSE, glm::value_ptr(glm::transpose(glm::inverse(toreMVMatrix))));
+    glDrawArrays(GL_TRIANGLES, 0, tore.getVertexCount());
+
+    glBindVertexArray(0);
+}
+
 int main(int argc, char** argv) {
 	int width_windows = 1350;
     int height_windows = 700;
@@ -90,6 +139,31 @@ int main(int argc, char** argv) {
 
     Sphere sphere(1, 32, 16); // rayon = 1, latitude = 32, longitude = 16
     Tore tore(0.5, 3, 72, 36); // rayon_interne = 0.1, rayon_externe = 1
+
+
+    GLuint vbo_mercure, vao_mercure;
+    Tore TrajectoireMercure = initTore(0.2, 16.5, vbo_mercure, vao_mercure);
+
+    GLuint vbo_venus, vao_venus;
+    Tore TrajectoireVenus = initTore(0.2, 24.5, vbo_venus, vao_venus);
+
+    GLuint vbo_terre, vao_terre;
+    Tore TrajectoireTerre = initTore(0.2, 30.5, vbo_terre, vao_terre);
+
+    GLuint vbo_mars, vao_mars;
+    Tore TrajectoireMars = initTore(0.2, 42, vbo_mars, vao_mars);
+
+    GLuint vbo_jupiter, vao_jupiter;
+    Tore TrajectoireJupiter = initTore(0.2, 63, vbo_jupiter, vao_jupiter);
+
+    GLuint vbo_saturne, vao_saturne;
+    Tore TrajectoireSaturne = initTore(0.2, 88, vbo_saturne, vao_saturne);
+
+    GLuint vbo_uranus, vao_uranus;
+    Tore TrajectoireUranus = initTore(0.2, 108, vbo_uranus, vao_uranus);
+
+    GLuint vbo_neptune, vao_neptune;
+    Tore TrajectoireNeptune = initTore(0.2, 135, vbo_neptune, vao_neptune);
 
     Transformation transfo;
     
@@ -165,7 +239,7 @@ int main(int argc, char** argv) {
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
 
-    glm::mat4 ProjMatrix = glm::perspective(glm::radians(70.f), 800.f/600.f, 0.1f, 100.f);
+    glm::mat4 ProjMatrix = glm::perspective(glm::radians(70.f), 800.f/600.f, 0.1f, 10000.f);
 
     glBufferData(GL_ARRAY_BUFFER, sphere.getVertexCount() * sizeof(ShapeVertex), sphere.getDataPointer(), GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -298,10 +372,10 @@ int main(int argc, char** argv) {
         glm::vec3 rotateUranus = rotateMercure;
     /* Neptune */
         /* Translation */
-        sphere.setSphere(transfo.translate(sphere.getSphere(), 1));
+        sphere.setSphere(transfo.translate(sphere.getSphere(), -2));
         glm::vec3 translateNeptune = transfo.applyTranslationX(sphere);
         /* Scale */
-        glm::vec3 scaleNeptune = scaleMercure;
+        glm::vec3 scaleNeptune = scaleUranus;
         /* Rotation */
         glm::vec3 rotateNeptune = rotateMercure;
     /* Lune */
@@ -379,6 +453,9 @@ int main(int argc, char** argv) {
 
         glm::mat4 globalMVMatrix = Camera.getViewMatrix();
 
+        std::cout << Camera.getPosition() << std::endl;
+        std::cout << Camera.getFrontVector() << std::endl;
+
         // Soleil (grande) avec OPENGL
         sunProgram.m_Program.use();
         glUniform1i(sunProgram.uTexture, 0);
@@ -418,10 +495,8 @@ int main(int argc, char** argv) {
         drawPlanet(sphere, uranusProgram, tex, texture[9], windowManager,
             globalMVMatrix, ProjMatrix, rotateGlobal, translateUranus, scaleUranus, rotateUranus, 1);
 
-        /*drawPlanet(sphere, neptuneProgram, tex, texture[10], windowManager,
+        drawPlanet(sphere, neptuneProgram, tex, texture[10], windowManager,
             globalMVMatrix, ProjMatrix, rotateGlobal, translateNeptune, scaleNeptune, rotateNeptune, 1.5);
-
-            */
 
 
         // Lune avec c3ga
@@ -465,19 +540,44 @@ int main(int argc, char** argv) {
         glBindVertexArray(vao_tore);
 
         saturneProgram.m_Program.use();
-            glm::mat4 toreMVMatrix = glm::rotate(globalMVMatrix, windowManager.getTime() * 0.5f, glm::vec3(0, 1, 0)); // Translation * Rotation
-            toreMVMatrix = glm::translate(toreMVMatrix, translateSaturne - glm::vec3(0, 2, -0.2));
-            toreMVMatrix = glm::rotate(toreMVMatrix, 80.0f, glm::vec3(1,0,0));
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, texture[1]);
-            glUniform1i(saturneProgram.uTexture, 0);
-            glUniformMatrix4fv(saturneProgram.uMVMatrix, 1, GL_FALSE, glm::value_ptr(toreMVMatrix));
-            glUniformMatrix4fv(saturneProgram.uMVPMatrix, 1, GL_FALSE, glm::value_ptr(ProjMatrix * toreMVMatrix));
-            glUniformMatrix4fv(saturneProgram.uNormalMatrix, 1, GL_FALSE, glm::value_ptr(glm::transpose(glm::inverse(toreMVMatrix))));
-            glDrawArrays(GL_TRIANGLES, 0, tore.getVertexCount());
+        glm::mat4 toreMVMatrix = glm::rotate(globalMVMatrix, windowManager.getTime() * 0.5f, glm::vec3(0, 1, 0)); // Translation * Rotation
+        toreMVMatrix = glm::translate(toreMVMatrix, translateSaturne - glm::vec3(0, 2, -0.2));
+        toreMVMatrix = glm::rotate(toreMVMatrix, 80.0f, glm::vec3(1,0,0));
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texture[1]);
+        glUniform1i(saturneProgram.uTexture, 0);
+        glUniformMatrix4fv(saturneProgram.uMVMatrix, 1, GL_FALSE, glm::value_ptr(toreMVMatrix));
+        glUniformMatrix4fv(saturneProgram.uMVPMatrix, 1, GL_FALSE, glm::value_ptr(ProjMatrix * toreMVMatrix));
+        glUniformMatrix4fv(saturneProgram.uNormalMatrix, 1, GL_FALSE, glm::value_ptr(glm::transpose(glm::inverse(toreMVMatrix))));
+        glDrawArrays(GL_TRIANGLES, 0, tore.getVertexCount());
 
     
         glBindVertexArray(0);
+
+
+        drawTore(TrajectoireMercure, vao_mercure, sunProgram, globalMVMatrix, windowManager,
+            texture[1], ProjMatrix, translateMercure);
+
+        drawTore(TrajectoireVenus, vao_venus, sunProgram, globalMVMatrix, windowManager,
+            texture[1], ProjMatrix, translateVenus);
+
+        drawTore(TrajectoireTerre, vao_terre, sunProgram, globalMVMatrix, windowManager,
+            texture[1], ProjMatrix, translateEarth);
+
+        drawTore(TrajectoireMars, vao_mars, sunProgram, globalMVMatrix, windowManager,
+            texture[1], ProjMatrix, translateMars);
+
+        drawTore(TrajectoireJupiter, vao_jupiter, sunProgram, globalMVMatrix, windowManager,
+            texture[1], ProjMatrix, translateJupiter);
+
+        drawTore(TrajectoireSaturne, vao_saturne, sunProgram, globalMVMatrix, windowManager,
+            texture[1], ProjMatrix, translateSaturne);
+
+        drawTore(TrajectoireUranus, vao_uranus, sunProgram, globalMVMatrix, windowManager,
+            texture[1], ProjMatrix, translateUranus);
+
+        drawTore(TrajectoireNeptune, vao_neptune, sunProgram, globalMVMatrix, windowManager,
+            texture[1], ProjMatrix, translateNeptune);
 
         // Update the display
         windowManager.swapBuffers();
