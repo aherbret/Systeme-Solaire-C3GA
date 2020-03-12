@@ -78,6 +78,11 @@ int main(int argc, char** argv) {
     TexProgram moonProgram(applicationPath);
     TexProgram mercureProgram(applicationPath);
     TexProgram venusProgram(applicationPath);
+    TexProgram marsProgram(applicationPath);
+    TexProgram jupiterProgram(applicationPath);
+    TexProgram saturneProgram(applicationPath);
+    TexProgram uranusProgram(applicationPath);
+    TexProgram neptuneProgram(applicationPath);
     Skytext skytex(applicationPath);
 
     Sphere sphere(1, 32, 16); // rayon = 1, latitude = 32, longitude = 16
@@ -134,20 +139,31 @@ int main(int argc, char** argv) {
     std::unique_ptr<Image> EarthMap = loadImage("../assets/textures/EarthMap.jpg");
     std::unique_ptr<Image> MercureMap = loadImage("../assets/textures/Mercure.jpg");
     std::unique_ptr<Image> VenusMap = loadImage("../assets/textures/Venus.jpg");
+    std::unique_ptr<Image> MarsMap = loadImage("../assets/textures/Mars.jpg");
+    std::unique_ptr<Image> JupiterMap = loadImage("../assets/textures/Jupiter.jpg");
+    std::unique_ptr<Image> SaturneMap = loadImage("../assets/textures/Saturne.jpg");
+    std::unique_ptr<Image> UranusMap = loadImage("../assets/textures/Uranus.jpg");
+    std::unique_ptr<Image> NeptuneMap = loadImage("../assets/textures/Neptune.jpg");
 
     if (SunMap == NULL || MoonMap == NULL || CloudMap == NULL || EarthMap == NULL
-        || MercureMap == NULL || VenusMap == NULL) {
+        || MercureMap == NULL || VenusMap == NULL || MarsMap == NULL || JupiterMap == NULL
+        || SaturneMap == NULL || UranusMap == NULL || NeptuneMap == NULL) {
         std::cerr << "Une des textures n'a pas pu etre chargée. \n" << std::endl;
         exit(0);
     }
-    GLuint texture[6];
-    glGenTextures(5, texture);
+    GLuint texture[11];
+    glGenTextures(10, texture);
     tex.firstBindTexture(SunMap, texture[0]); //Binding de la texture SunMap
     tex.firstBindTexture(MoonMap, texture[1]); //Binding de la texture MoonMap
     tex.firstBindTexture(CloudMap, texture[2]); //Binding de la texture CloudMap
     tex.firstBindTexture(EarthMap, texture[3]); //Binding de la texture EarthMap
     tex.firstBindTexture(MercureMap, texture[4]); //Binding de la texture MercureMap
     tex.firstBindTexture(VenusMap, texture[5]); //Binding de la texture VenusMap
+    tex.firstBindTexture(MarsMap, texture[6]); //Binding de la texture MarsMap
+    tex.firstBindTexture(JupiterMap, texture[7]); //Binding de la texture JupiterMap
+    tex.firstBindTexture(SaturneMap, texture[8]); //Binding de la texture SaturneMap
+    tex.firstBindTexture(UranusMap, texture[9]); //Binding de la texture UranusMap
+    tex.firstBindTexture(NeptuneMap, texture[10]); //Binding de la texture NeptuneMap
     //// Fin Textures planetes
 
     GLuint vbo;
@@ -252,6 +268,46 @@ int main(int argc, char** argv) {
         glm::vec3 scaleEarth = scaleMercure;
         /* Rotation */
         glm::vec3 rotateEarth = rotateMercure;
+    /* Mars */
+        /* Translation */
+        sphere.setSphere(transfo.translate(sphere.getSphere(), 1));
+        glm::vec3 translateMars = transfo.applyTranslationX(sphere);
+        /* Scale */
+        glm::vec3 scaleMars = scaleMercure;
+        /* Rotation */
+        glm::vec3 rotateMars = rotateMercure;
+    /* Jupiter */
+        /* Translation */
+        sphere.setSphere(transfo.translate(sphere.getSphere(), 1));
+        glm::vec3 translateJupiter = transfo.applyTranslationX(sphere);
+        /* Scale */
+        glm::vec3 scaleJupiter = scaleMercure;
+        /* Rotation */
+        glm::vec3 rotateJupiter = rotateMercure;
+    /* Saturne */
+        /* Translation */
+        sphere.setSphere(transfo.translate(sphere.getSphere(), 1));
+        glm::vec3 translateSaturne = transfo.applyTranslationX(sphere);
+        /* Scale */
+        glm::vec3 scaleSaturne = scaleMercure;
+        /* Rotation */
+        glm::vec3 rotateSaturne = rotateMercure;
+    /* Uranus */
+        /* Translation */
+        sphere.setSphere(transfo.translate(sphere.getSphere(), 1));
+        glm::vec3 translateUranus = transfo.applyTranslationX(sphere);
+        /* Scale */
+        glm::vec3 scaleUranus = scaleMercure;
+        /* Rotation */
+        glm::vec3 rotateUranus = rotateMercure;
+    /* Neptune */
+        /* Translation */
+        sphere.setSphere(transfo.translate(sphere.getSphere(), 1));
+        glm::vec3 translateNeptune = transfo.applyTranslationX(sphere);
+        /* Scale */
+        glm::vec3 scaleNeptune = scaleMercure;
+        /* Rotation */
+        glm::vec3 rotateNeptune = rotateMercure;
 
 
     while (!done) {
@@ -398,6 +454,21 @@ int main(int argc, char** argv) {
         // tex.activeAndBindTexture(GL_TEXTURE0, 0);
         // tex.activeAndBindTexture(GL_TEXTURE1, 0);
         // //glUniform1i(earthProgram.uEarthTexture, 0);
+
+        drawPlanet(sphere, marsProgram, tex, texture[6], windowManager,
+            globalMVMatrix, ProjMatrix, rotateGlobal, translateMars, scaleMars, rotateMars);
+
+        drawPlanet(sphere, jupiterProgram, tex, texture[7], windowManager,
+            globalMVMatrix, ProjMatrix, rotateGlobal, translateJupiter, scaleJupiter, rotateJupiter);
+
+        drawPlanet(sphere, saturneProgram, tex, texture[8], windowManager,
+            globalMVMatrix, ProjMatrix, rotateGlobal, translateSaturne, scaleSaturne, rotateSaturne);
+
+        drawPlanet(sphere, uranusProgram, tex, texture[9], windowManager,
+            globalMVMatrix, ProjMatrix, rotateGlobal, translateUranus, scaleUranus, rotateUranus);
+
+        drawPlanet(sphere, neptuneProgram, tex, texture[10], windowManager,
+            globalMVMatrix, ProjMatrix, rotateGlobal, translateNeptune, scaleNeptune, rotateNeptune);
 
         glBindVertexArray(0);
 
