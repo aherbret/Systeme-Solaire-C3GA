@@ -454,7 +454,7 @@ int main(int argc, char** argv) {
 
         saturneProgram.m_Program.use();
             glm::mat4 toreMVMatrix = glm::rotate(globalMVMatrix, windowManager.getTime() * 0.5f, glm::vec3(0, 1, 0)); // Translation * Rotation
-            toreMVMatrix = glm::translate(toreMVMatrix, translateSaturne - glm::vec3( -0.3,2,0.5));
+            toreMVMatrix = glm::translate(toreMVMatrix, translateSaturne - glm::vec3(0, 2, -0.2));
             toreMVMatrix = glm::rotate(toreMVMatrix, 80.0f, glm::vec3(1,0,0));
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, texture[5]);
