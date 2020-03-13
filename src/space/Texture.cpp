@@ -4,7 +4,6 @@
 #include "glimac/common.hpp"
 #include <../include/space/Texture.hpp>
 
-
 void Texture::firstBindTexture(std::unique_ptr<Image> &texLoad, GLuint texture) {
     //Binding de la texture 
     glBindTexture(GL_TEXTURE_2D, texture);
@@ -19,4 +18,3 @@ void Texture::activeAndBindTexture(GLenum tex, GLuint texture) {
 	glActiveTexture(tex);
     glBindTexture(GL_TEXTURE_2D, texture);
 }
-

@@ -1,14 +1,14 @@
 #include <cmath>
 #include <vector>
 #include <iostream>
-#include "glimac/common.hpp"
 #include <glimac/Image.hpp>
-#include <../include/space/SkyBox.hpp>
-#include "../include/glimac/Cube.hpp"
+#include "glimac/common.hpp"
 #include "../src/glimac/stb_image.h"
+#include "../include/glimac/Cube.hpp"
+#include <../include/space/SkyBox.hpp>
 
 SkyBox::SkyBox(const GLsizei count_vertex_skybox, const ShapeVertex *verticesSkybox) {
-    buildSkyBox(count_vertex_skybox, verticesSkybox); // Construction (voir le .cpp)
+    buildSkyBox(count_vertex_skybox, verticesSkybox);
 }
 
 SkyBox::~SkyBox() {}
@@ -39,7 +39,6 @@ void SkyBox::buildSkyBox(const GLsizei count_vertex_skybox, const ShapeVertex *v
     glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
-	/// Fin bind skybox
 }
 
 unsigned int SkyBox::loadCubemap(std::vector<std::string> faces) {

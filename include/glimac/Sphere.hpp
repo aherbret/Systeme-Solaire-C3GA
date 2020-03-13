@@ -23,9 +23,6 @@ namespace glimac {
             // Alloue et construit les données (implantation dans le .cpp)
             void build(GLfloat radius, GLsizei discLat, GLsizei discLong);
 
-            // Alloue et construit les données (implantation dans le .cpp)
-            void buildC3GA();
-
             // Renvoit le pointeur vers les données
             const ShapeVertex* getDataPointer() const;
             

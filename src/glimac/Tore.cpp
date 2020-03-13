@@ -4,8 +4,6 @@
 #include "glimac/common.hpp"
 #include "glimac/Tore.hpp"
 
-#include "c3ga/c3gaTools.hpp"
-
 namespace glimac {
     // Constructeur: alloue le tableau de données et construit les attributs des vertex
     Tore::Tore(GLfloat ri, GLfloat re, GLsizei nbi, GLsizei nbe):
@@ -23,19 +21,16 @@ namespace glimac {
         
         std::vector<ShapeVertex> data;
         float x1, y1, z1;
-        float alphai, alphaj;
-        float cosalphai, cosalphaj;
-        float sinalphai, sinalphaj;
+        float alphai;
+        float cosalphai;
+        float sinalphai;
         float beta, cosbeta, sinbeta;
         float fact = 0.1;
         // Construit l'ensemble des vertex
         for (int i = 0; i < nbi + 1; i++) {
             alphai = 2 * M_PI * i / nbi;
-            alphaj = alphai + 2 * M_PI / nbi;
             cosalphai = cos(alphai);
             sinalphai = sin(alphai);
-            cosalphaj = cos(alphaj);
-            sinalphaj = sin(alphaj);
             for (int j = 0; j <= nbe; j++) {
                 beta = 2 * M_PI * j / nbe;
                 cosbeta = cos(beta);

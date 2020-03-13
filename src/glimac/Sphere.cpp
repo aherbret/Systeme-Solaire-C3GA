@@ -66,42 +66,6 @@ namespace glimac {
         }
     }
 
-
-    // Creation des vertex
-    void Sphere::buildC3GA() {
-        /*
-        std::cout << radiusVector << std::endl;
-        c3ga::Mvec<GLfloat> dual = radiusVector.dual();
-
-        dual /= dual[c3ga::E0];
-
-        GLfloat radius = std::sqrt(dual | dual);
-        std::cout << "radius " << radius << " " << dual << " " << (dual | dual) << std::endl;
-        std::cout << "radius " << dual[0] << " " << dual[1] << " " << dual[2] << std::endl;
-
-        dual.display();
-        */
-
-        GLfloat radius = 10;
-        c3ga::Mvec<double> sphere = c3ga::point<double>(0,1,0)
-                            ^ c3ga::point<double>(0,0,-1)
-                            ^ c3ga::point<double>(0,0,1)
-                            ^ c3ga::point<double>(1,0,0);
-
-        std::cout << "test " << sphere << " test" << std::endl;
-        sphere.display();
-
-        GLfloat rcpLat = 1.f / latitude, rcpLong = 1.f / longitude;
-        GLfloat dPhi = 2 * glm::pi<float>() * rcpLat, dTheta = glm::pi<float>() * rcpLong;
-        
-        std::vector<ShapeVertex> data;
-
-        // Construit l'ensemble des vertex
-        for(GLsizei j = 0; j <= 10; ++j) {
-            
-        }
-    }
-
     c3ga::Mvec<double> Sphere::sphere(float Rsphere) {
         c3ga::Mvec<double> x1, x2, x3, x4, p1, p2, p3, p4;
         c3ga::Mvec<double> dualSphere;
