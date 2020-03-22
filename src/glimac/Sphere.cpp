@@ -14,7 +14,6 @@ namespace glimac {
     Sphere::Sphere(GLfloat radius, GLsizei discLat, GLsizei discLong):
         vertexCount(0) {
         build(radius, discLat, discLong); // Construction (voir le .cpp)
-        //buildC3GA();
     }
 
     Sphere::~Sphere(){}
@@ -30,7 +29,6 @@ namespace glimac {
         GLfloat dPhi = 2 * glm::pi<float>() * rcpLat, dTheta = glm::pi<float>() * rcpLong;
         
         std::vector<ShapeVertex> data;
-        
         // Construit l'ensemble des vertex
         for(GLsizei j = 0; j <= discLong; ++j) {
             GLfloat cosTheta = cos(-glm::pi<float>() / 2 + j * dTheta);

@@ -270,8 +270,6 @@ int main(int argc, char** argv) {
 
     /* Transformations appliquer aux planetes */
     Transformation transfo;
-    //sphere.setSphere(transfo.rotate(sphere.getSphere(), 0, c3ga::e23<double>()));
-    //glm::vec3 rotateGlobal = transfo.applyRotation(sphere);
     glm::vec3 rotateGlobal = glm::vec3(0, 1, 0);
     // Mercure
         // Translation
@@ -374,7 +372,6 @@ int main(int argc, char** argv) {
     glm::mat4 ProjMatrix = glm::perspective(glm::radians(70.f), 800.f/600.f, 0.1f, 10000.f);
     // Application loop:
     while (!done) {
-        //glm::mat4 ViewMatrix = Camera.getViewMatrix();
         // Event loop:
         SDL_Event e;
         while (windowManager.pollEvent(e)) {

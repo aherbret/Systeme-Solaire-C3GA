@@ -11,7 +11,6 @@ uniform sampler2D uTexture2;
 out vec3 fFragColor;
 
 void main() {
-
     vec4 color = texture(uTexture, vTexCoords);
     vec4 color2 = texture(uTexture2, vTexCoords);
 

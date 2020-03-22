@@ -1,7 +1,7 @@
 Systeme-Solaire-C3GA
 ====================
 
-Le projet consiste à développer un système solaire composé de 8 planètes.
+Le projet consiste à développer un système solaire composé de 8 planètes, 1 étoile et 2 satellites.
 Ce projet est développé en C++ à l'aide des librairie OpenGL et C3GA.
 
 Installation

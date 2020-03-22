@@ -14,7 +14,6 @@ out vec3 vNormal;
 out vec2 vTexCoords;
 
 void main(){
-
     vec4 vertexPosition = vec4(aPosition, 1);
     vec4 vertexNormal = vec4(aNormal, 0);
 

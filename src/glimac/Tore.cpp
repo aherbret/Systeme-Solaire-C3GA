@@ -39,7 +39,7 @@ namespace glimac {
                 ShapeVertex vertex;
                 x1 = (re + ri * cosbeta) * cosalphai;
                 y1 = (re + ri * cosbeta) * sinalphai;
-                z1 = ri + 2;//* sinbeta;
+                z1 = ri + 2;
                 vertex.texCoords.x = i / nbi * fact;
                 vertex.texCoords.y = j / nbe * fact;
                 vertex.normal.x = cosbeta * cosalphai;
