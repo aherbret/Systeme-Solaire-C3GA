@@ -69,17 +69,17 @@ namespace glimac {
     c3ga::Mvec<double> Sphere::sphere(float Rsphere) {
         c3ga::Mvec<double> x1, x2, x3, x4, p1, p2, p3, p4;
         c3ga::Mvec<double> dualSphere;
-        x1 = (0.0*c3ga::e1<double>()) + (0.0*c3ga::e2<double>()) + (Rsphere*c3ga::e3<double>());
-        p1 = c3ga::e0<double>() + x1 + (0.5*x1.quadraticNorm()*c3ga::ei<double>());
+        x1 = (0.0 * c3ga::e1<double>()) + (0.0 * c3ga::e2<double>()) + (Rsphere * c3ga::e3<double>());
+        p1 = c3ga::e0<double>() + x1 + (0.5 * x1.quadraticNorm()*c3ga::ei<double>());
 
-        x2 = (0.0*c3ga::e1<double>()) + (0.0*c3ga::e2<double>()) + (-Rsphere*c3ga::e3<double>());
-        p2 = c3ga::e0<double>() + x2 + (0.5*x2.quadraticNorm()*c3ga::ei<double>());
+        x2 = (0.0 * c3ga::e1<double>()) + (0.0 * c3ga::e2<double>()) + (-Rsphere * c3ga::e3<double>());
+        p2 = c3ga::e0<double>() + x2 + (0.5 * x2.quadraticNorm()*c3ga::ei<double>());
 
-        x3 = (Rsphere*c3ga::e1<double>()) + (0.0*c3ga::e2<double>()) + (0.0*c3ga::e3<double>());
+        x3 = (Rsphere * c3ga::e1<double>()) + (0.0 * c3ga::e2<double>()) + (0.0 * c3ga::e3<double>());
         p3 = c3ga::e0<double>() + x3 + (0.5*x3.quadraticNorm()*c3ga::ei<double>());
 
-        x4 = (0.0*c3ga::e1<double>()) + (Rsphere*c3ga::e2<double>()) + (0.0*c3ga::e3<double>());
-        p4 = c3ga::e0<double>() + x4 + (0.5*x4.quadraticNorm()*c3ga::ei<double>());
+        x4 = (0.0 * c3ga::e1<double>()) + (Rsphere * c3ga::e2<double>()) + (0.0 * c3ga::e3<double>());
+        p4 = c3ga::e0<double>() + x4 + (0.5 * x4.quadraticNorm()*c3ga::ei<double>());
 
         s = (p1 ^ p2 ^ p3 ^ p4);
         dualSphere = s.dual();
